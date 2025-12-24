@@ -1,0 +1,13 @@
+# used to prevent Firebase keys
+HabitIQServer/firebase/*.jsoncd
+firebase/*.json
+
+# Ignore build outputs
+bin/
+obj/
+
+# Ignore user-specific files
+*.user
+*.swp
+*.suo
+*.tmp
