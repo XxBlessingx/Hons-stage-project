@@ -58,7 +58,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    const form = document.getElementById("signup-form");
+    const form = document.getElementById("login-form");
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -67,13 +67,8 @@
       const password = document.getElementById("password").value;
 
       try {
-        const userCredential = await createUserWithEmailAndPassword(
-          auth,
-          email,
-          password
-        );
-        alert("Account created successfully");
-        console.log(userCredential.user);
+        await signInWithEmailAndPassword(auth, email, password);
+        alert("Login successful 🎉");
       } catch (error) {
         alert(error.message);
         console.error(error);
