@@ -1,32 +1,43 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <title> HabitIQ | Sign up  </title>
+    <meta charset="UFT-8" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title> HabitIQ | Login page</title>
 
-        <link rel="stylesheet" href="styles.css" />
-    </head>
+    <link rel="stylesheet" href="style.css"/>
+    </head> 
+
     <body>
         <main class="auth-container">
-    <h1>HabitIQ</h1>
-    <p class="subtitle">Smart habit tracking for students</p>
+        <h1>HabitIQ</h1>
+        <p class="subtitle">Welcome back</p>
 
-    <form id="signup-form">
+        <form id="login-form">
       <label for="email">Email</label>
-      <input type="email" id="email" placeholder="you@student.ac.uk" required />
+      <input
+        type="email"
+        id="email"
+        placeholder="Email address"
+        required
+      />
 
       <label for="password">Password</label>
-      <input type="password" id="password" placeholder="Password" required />
-
-      <button type="submit">Create Account</button>
+      <input
+        type="password"
+        id="password"
+        required
+        />
+   
+           <button type="submit">Log In</button>
     </form>
 
     <p class="switch-auth">
-      Already have an account?
-      <a href="login.html">Log in</a>
+      Don’t have an account?
+      <a href="index.html">Sign up</a>
     </p>
   </main>
-  <script type="module">
+
+   <script type="module">
      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import {
       getAuth,
@@ -68,4 +79,5 @@
     });
   </script>
 </body>
+
 </html>
