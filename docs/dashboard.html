@@ -36,12 +36,11 @@
         const Welcome = document.getElementById("Welcome");
         const logoutBtn = document.getElementById("Logout")
 
-        onAuthStateChanged(auth, (user) => {
-            if (user){
-                Welcome.textContent = "Welcome, $(user.email)";
-            }
-            else{
-                window.location.href ="login.html";
+          onAuthStateChanged(auth, (user) => {
+            if (user) {
+                welcome.textContent = `Welcome, ${user.email}`;
+            } else {
+                window.location.href = "login.html";
             }
         });
 
