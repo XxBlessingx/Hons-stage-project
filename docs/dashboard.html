@@ -36,21 +36,13 @@
         // Used as a authticstion gaurd and set up 
         onAuthStateChanged(auth, (user) => {
             if (!user) window.location.href = "login.html";
+            return
         });
+            // print the users name on the dashboard 
+          welcome.textContent = `Welcome, ${user.displayName || user.email}`;
 
-
-        const Welcome = document.getElementById("Welcome");
+        const welcome = document.getElementById("Welcome");
         const logoutBtn = document.getElementById("Logout")
-
-        // once the user has logged into their account 
-          onAuthStateChanged(auth, (user) => {
-            if (!user) {
-                window.location.href = "login.html";
-                return;
-            }
-            
-            welcomeEl.textContent = `Welcome, ${user.displayName || user.email}`;
-        });
 
         //logging out protol call 
         logoutBtn.addEventListener("click",async() => {
