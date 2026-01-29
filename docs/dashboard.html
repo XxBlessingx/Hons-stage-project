@@ -9,9 +9,22 @@
     <body>
         <main class="dashboard">
             <h1 id="welcome">Welcome</h1>
+            <section class="habits">
+                <form id="habit-form">
+                    <input
+                    type="text"
+                    id="habit-name"
+                    placeholder="New habit (e.g. Brush teeth)"
+                    required
+                    />
+                    <button type="submit">Add Habit</button>
+                </form>
+                <ul id="habit-horder"></ul>
+            </section>
             <button id="logout"> Log out</button>
+            
         </main>
-
+            
          <script type="module">
             import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
             import {
@@ -19,6 +32,15 @@
                 onAuthStateChanged,
                 signOut
             } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+            import{
+                getFirestore,
+                collection,
+                addDoc,
+                getDocs,
+                deleteDocs,
+                doc,
+                serverTimestamp
+            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
             
             const firebaseConfig = {
             apiKey: "AIzaSyDUPdCJIpj09iUSHL4Dm_ZwbYuHzzq_SmM",
@@ -31,18 +53,68 @@
         
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
         
         const welcome = document.getElementById("welcome");
         const logoutBtn = document.getElementById("logout")
+        const habitForm = document.getElementById("habit-form");
+        const habitInput = document.getElementById("habit-name");
+        const habitList = document.getElementById("habit-list");
 
-        onAuthStateChanged(auth, (user) =>{
-            if (user){
-                welcome.textContent ="welcome, ${user.email}";
-            } else {
+       
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
                 window.location.href = "login.html";
-
+                return;
             }
+
+            welcome.textContent = `Welcome, ${user.displayName || user.email}`;
+            habitList.innerHTML = "";
+
+            const habitsRef = collection(db, "users", user.uid, "habits");
+            const snapshot = await getDocs(habitsRef);
+
+            snapshot.forEach((docSnap) => {
+             renderHabit(docSnap.id, docSnap.data().name, user.uid);
+            });
         });
+
+         // for adding a habit/task
+         habitForm.addEventListener("submit",async (e) =>{
+            e.preventDefault();
+
+            const user = auth.currentUser;
+            if(!user) return;
+
+            await addDoc(
+                collection(db, "users",user.uid, "habits"),
+                {
+
+                    name:habitInput.value,
+                    createAT: serverTimestamp()
+                }
+            );
+            habitInput.value="";
+            location.reload(); 
+         });
+
+         //for deleting a habit
+
+         function renderHabit(id, name,uid){
+            const li = document.createElement("li");
+            li.textContent =name;
+
+            const delBtn = document.createElement("button");
+            delBtn.textContent = "Delete";
+
+           delBtn.addEventListener("click", async () => {
+            await deleteDoc(doc(db, "users", uid, "habits", id));
+            li.remove();
+            });
+            
+            li.appendChild(delBtn);
+            habitList.appendChild(li);
+        }
 
         logoutBtn.addEventListener("click",async ()=> {
             await signOut(auth);
