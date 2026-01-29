@@ -38,7 +38,7 @@
 
         onAuthStateChanged(auth, (user) => {
             if (user){
-                Welcome.textContent = "Welcome, $(user.name)";
+                Welcome.textContent = "Welcome, $(user.email)";
             }
             else{
                 window.location.href ="login.html";
