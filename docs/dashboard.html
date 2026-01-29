@@ -45,7 +45,7 @@
         // once the user has logged into their account 
           onAuthStateChanged(auth, (user) => {
             if (user) {
-                Welcome.textContent = `Welcome, ${user.email}`;
+                Welcome.textContent = `Welcome, ${user.name}`;
             } else {
                 window.location.href = "login.html";
             }
