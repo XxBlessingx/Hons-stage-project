@@ -62,7 +62,7 @@
           email,
           password
         );
-        alert("Account created successfully 🎉");
+        window.location.href = "dashboard.html";
         console.log(userCredential.user);
       } catch (error) {
         alert(error.message);

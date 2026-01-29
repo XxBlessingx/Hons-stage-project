@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UFT-8" name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0"/>
         <title>HabitIQ | Dashboard</title>
         <link rel="stylesheet" href="styles.css"/>
     </head>
@@ -33,17 +33,25 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
+        // Used as a authticstion gaurd and set up 
+        onAuthStateChanged(auth, (user) => {
+            if (!user) window.location.href = "login.html";
+        });
+
+
         const Welcome = document.getElementById("Welcome");
         const logoutBtn = document.getElementById("Logout")
 
+        // once the user has logged into their account 
           onAuthStateChanged(auth, (user) => {
             if (user) {
-                welcome.textContent = `Welcome, ${user.email}`;
+                Welcome.textContent = `Welcome, ${user.email}`;
             } else {
                 window.location.href = "login.html";
             }
         });
 
+        //logging out protol call 
         logoutBtn.addEventListener("click",async() => {
             await signOut(auth);
             window.location.href ="login.html";
