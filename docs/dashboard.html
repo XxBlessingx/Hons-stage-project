@@ -44,11 +44,12 @@
 
         // once the user has logged into their account 
           onAuthStateChanged(auth, (user) => {
-            if (user) {
-                Welcome.textContent = `Welcome, ${user.name}`;
-            } else {
+            if (!user) {
                 window.location.href = "login.html";
+                return;
             }
+            
+            welcomeEl.textContent = `Welcome, ${user.displayName || user.email}`;
         });
 
         //logging out protol call 
