@@ -1,55 +1,55 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>HabitIQ | Dashboard</title>
+<html>
+    <head>
+        <meta charset="UTF-8" name="viewport" content="width-device-width, initial-scale=1.0"/>
+        <title>HabitIQ | Dashboard</title>
+        <link rel="stylesheet" href="styles.css"/>
+    </head>
 
-  <link rel="stylesheet" href="styles.css" />
-</head>
+    <body>
+        <main class="dashboard">
+            <h1 id="welcome">Welcome</h1>
+            <button id="logout"> Log out</button>
+        </main>
 
-<body>
-  <main class="dashboard">
-    <h1 id="welcome">Welcome</h1>
-    <button id="logout">Log out</button>
-  </main>
+         <script type="module">
+            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+            import {
+                getAuth,
+                onAuthStateChanged,
+                signOut
+            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+            
+            const firebaseConfig = {
+            apiKey: "AIzaSyDUPdCJIpj09iUSHL4Dm_ZwbYuHzzq_SmM",
+            authDomain: "habitiq-364b5.firebaseapp.com",
+            projectId: "habitiq-364b5",
+            storageBucket: "habitiq-364b5.firebasestorage.app",
+            messagingSenderId: "825959188014",
+            appId: "1:825959188014:web:ec3fc6ed82a076be4f01bf"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        
+        const welcome = document.getElementById("welcome");
+        const logoutBtn = document.getElementById("logout")
 
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        onAuthStateChanged(auth, (user) =>{
+            if (user){
+                welcome.textContent ="welcome, ${user.email}";
+            } else {
+                window.location.href = "login.html";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyDUPdCJIpj09iUSHL4Dm_ZwbYuHzzq_SmM",
-      authDomain: "habitiq-364b5.firebaseapp.com",
-      projectId: "habitiq-364b5",
-      appId: "1:825959188014:web:ec3fc6ed82a076be4f01bf"
-    };
+            }
+        });
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-
-    const welcomeEl = document.getElementById("welcome");
-    const logoutBtn = document.getElementById("logout");
-
-    // 🔐 AUTH GUARD + SETUP (ONLY ONE LISTENER)
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "login.html";
-        return;
-      }
-
-      welcomeEl.textContent = `Welcome, ${user.displayName || user.email}`;
-    });
-
-    // 🚪 LOGOUT
-    logoutBtn.addEventListener("click", async () => {
-      await signOut(auth);
-      window.location.href = "login.html";
-    });
+        logoutBtn.addEventListener("click",async ()=> {
+            await signOut(auth);
+            window.location.href = "login.html";
+        });
   </script>
-</body>
+
+    </body>
+
 </html>
