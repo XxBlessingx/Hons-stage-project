@@ -74,8 +74,8 @@ button:hover {
 }
 
 .options button.selected {
-  background-color: #4f46e5;
-  color: white;
+  background-color: #d38c35;
+  color: rgba(255, 255, 255, 0.81);
 }
 
 .step {
