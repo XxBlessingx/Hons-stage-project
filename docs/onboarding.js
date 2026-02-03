@@ -63,6 +63,16 @@ steps.forEach((step) => {
       showStep(currentStep);
     });
   }
-});
+}); 
+const finishBtn = document.getElementById("finish");
+
+if (finishBtn) {
+  finishBtn.addEventListener("click", () => {
+    console.log("Onboarding complete:", onboardingData);
+
+    // TEMP: redirect straight to dashboard
+    window.location.href = "dashboard.html";
+  });
+}
 
 
