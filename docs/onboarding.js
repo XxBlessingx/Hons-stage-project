@@ -65,7 +65,4 @@ steps.forEach((step) => {
   }
 });
 
-// OPTIONAL (for debugging only)
-// Lets you type `onboardingData` in the browser console
-// to see stored answers live
-window.onboardingData = onboardingData;
+
