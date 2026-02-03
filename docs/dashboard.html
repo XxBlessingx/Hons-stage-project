@@ -94,8 +94,9 @@
                     createAT: serverTimestamp()
                 }
             );
+            renderHabit(docRef.id,habitInput.value, user.uid);
             habitInput.value="";
-            location.reload(); 
+            //location.reload(); 
          });
 
          //for deleting a habit

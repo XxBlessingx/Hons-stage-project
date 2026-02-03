@@ -72,3 +72,8 @@ button:hover {
   color: #3f51b5;
   text-decoration: none;
 }
+
+.options button.selected {
+  background-color: #4f46e5;
+  color: white;
+}

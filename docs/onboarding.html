@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0" />
+    <head>
+        <title>HabitIQ | Onboarding </title>
+         
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <h1>Getting to know you a bit better</h1>
+
+        <section class="step active" data-step="consistency">
+            <h2>How consistant do you feel with your habits right now</h2>
+
+            <div class="options">
+                <button type="button" data-value="stuggle to keep habit going"> I stuggle to keep habit going</button>
+                <button type="button" data-value="start but lose momentum"> I start but lose momentum</button>
+                <button type="button" data-value="fairly consistant"> I'm fairly consistant</button>
+            </div>
+            <button class="next" disabled>Next</button>
+        </section>
+
+        <!-- QUESTION 2 -->
+
+        <section class="step" data-step="barrier">
+            <h2> What usually gets in the way of your habits?</h2>
+
+            <div class="options">
+                <button type="button" data-value="forgetting/lack of reminders"> Forgetting / lack of reminders</button>
+                <button type="button" data-value="lack of motivation"> Lack of motivation</button>
+                <button type="button" data-value="poor time management"> Poor time management</button>
+                <button type="button" data-value="losing interest over time"> Losing interest over time </button>
+            </div>
+            <button class="next" disabled>Next</button>
+        </section>
+
+
+        <!-- QUESTION 3 -->
+        <section class="step" data-step="support">
+            <h2>What type of habits do you want the most support with right now?</h2>
+            
+            <div class="options">
+                <button type="button" data-value="studying">Studying / productivity</button>
+                <button type="button" data-value="health">Health & wellbeing</button>
+                <button type="button" data-value="routine">Daily routines</button>
+                <button type="button" data-value="mixed">A mix of everything</button>
+            </div>
+           
+            <button class="next" disabled>Next</button>
+        </section>
+
+
+        <!--QUESTION 4-->
+
+
+        <section class="step" data-step="support">
+            <h2>How would you like Habit to support you</h2>
+            <div class="options">
+                <button type="button" data-value="gentle reminders">Gentle reminders and encouragement</button>
+                <button type="button" data-value="accountability">Clear structure and accountability</button>
+                <button type="button" data-value="mix">A mix I'll figure it out as I go</button>
+            </div>
+
+            <button class="finish" disabled>Continue</button>
+        </section>
+
+        <script type="module" src="onboarding.js"></script>
+    </body>
+</html>
