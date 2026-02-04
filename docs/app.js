@@ -1,1 +1,71 @@
 // Will be using this for the dashboard logic//
+//import {initializeApp} from
+// app.js — dashboard logic only
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import {
+  getFirestore,
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// Firebase config
+const firebaseConfig = {
+   apiKey: "AIzaSyDUPdCJIpj09iUSHL4Dm_ZwbYuHzzq_SmM",
+  authDomain: "habitiq-364b5.firebaseapp.com",
+  projectId: "habitiq-364b5",
+  storageBucket: "habitiq-364b5.firebasestorage.app",
+  messagingSenderId: "825959188014",
+  appId: "1:825959188014:web:ec3fc6ed82a076be4f01bf"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Elements
+const welcomeEl = document.getElementById("welcome");
+const logoutBtn = document.getElementById("logout");
+
+// AUTH GUARD + ONBOARDING CHECK
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    window.location.href = "login.html";
+    return;
+  }
+
+  const userSnap = await getDoc(doc(db, "users", user.uid));
+
+  if (!userSnap.exists() || !userSnap.data().onboardingComplete) {
+    window.location.href = "onboarding.html";
+    return;
+  }
+
+  // User is authenticated + onboarded
+  welcomeEl.textContent = `Welcome, ${user.displayName || user.email}`;
+});
+
+
+
+// LOGOUT
+logoutBtn.addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.href = "login.html";
+});
+
+
+
+
+// making sure that new users move to the dashboard then the dashboard and that returning users go to the dashboard
+/*const userDoc = await getDoc(doc(db, "users", user.uid));
+
+if (!userDoc.exists() || !userDoc.data().onboardingComplete) {
+  window.location.href = "onboarding.html";
+} else {
+  window.location.href = "dashboard.html";
+}*/
