@@ -68,6 +68,11 @@
           displayName: name
         });
 
+        await setDoc(doc(db, "users", user.uid), {
+          name: name,
+          onboardingComplete: false,
+        });
+
         window.location.href = "onboarding.html";
         //console.log(userCredential.user);
       } catch (error) {

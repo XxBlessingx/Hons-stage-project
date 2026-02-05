@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8" name="viewport" content="width-device-width, initial-scale=1.0"/>
+        <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0"/>
         <title>HabitIQ | Dashboard</title>
         <link rel="stylesheet" href="styles.css"/>
     </head>
@@ -19,109 +19,15 @@
                     />
                     <button type="submit">Add Habit</button>
                 </form>
-                <ul id="habit-horder"></ul>
+
+                <ul id="habit-list"></ul>
             </section>
+
             <button id="logout"> Log out</button>
             
         </main>
-            
-         <script type="module">
-            import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-            import {
-                getAuth,
-                onAuthStateChanged,
-                signOut
-            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-            import{
-                getFirestore,
-                collection,
-                addDoc,
-                getDocs,
-                deleteDocs,
-                doc,
-                serverTimestamp
-            } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-            
-            const firebaseConfig = {
-            apiKey: "AIzaSyDUPdCJIpj09iUSHL4Dm_ZwbYuHzzq_SmM",
-            authDomain: "habitiq-364b5.firebaseapp.com",
-            projectId: "habitiq-364b5",
-            storageBucket: "habitiq-364b5.firebasestorage.app",
-            messagingSenderId: "825959188014",
-            appId: "1:825959188014:web:ec3fc6ed82a076be4f01bf"
-        };
         
-        const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
-        const db = getFirestore(app);
-        
-        const welcome = document.getElementById("welcome");
-        const logoutBtn = document.getElementById("logout")
-        const habitForm = document.getElementById("habit-form");
-        const habitInput = document.getElementById("habit-name");
-        const habitList = document.getElementById("habit-list");
-
-       
-        onAuthStateChanged(auth, async (user) => {
-            if (!user) {
-                window.location.href = "login.html";
-                return;
-            }
-
-            welcome.textContent = `Welcome, ${user.displayName || user.email}`;
-            habitList.innerHTML = "";
-
-            const habitsRef = collection(db, "users", user.uid, "habits");
-            const snapshot = await getDocs(habitsRef);
-
-            snapshot.forEach((docSnap) => {
-             renderHabit(docSnap.id, docSnap.data().name, user.uid);
-            });
-        });
-
-         // for adding a habit/task
-         habitForm.addEventListener("submit",async (e) =>{
-            e.preventDefault();
-
-            const user = auth.currentUser;
-            if(!user) return;
-
-            await addDoc(
-                collection(db, "users",user.uid, "habits"),
-                {
-
-                    name:habitInput.value,
-                    createAT: serverTimestamp()
-                }
-            );
-            renderHabit(docRef.id,habitInput.value, user.uid);
-            habitInput.value="";
-            //location.reload(); 
-         });
-
-         //for deleting a habit
-
-         function renderHabit(id, name,uid){
-            const li = document.createElement("li");
-            li.textContent =name;
-
-            const delBtn = document.createElement("button");
-            delBtn.textContent = "Delete";
-
-           delBtn.addEventListener("click", async () => {
-            await deleteDoc(doc(db, "users", uid, "habits", id));
-            li.remove();
-            });
-            
-            li.appendChild(delBtn);
-            habitList.appendChild(li);
-        }
-
-        logoutBtn.addEventListener("click",async ()=> {
-            await signOut(auth);
-            window.location.href = "login.html";
-        });
-  </script>
+        <script type="module" src="app.js"></script>
 
     </body>
 
