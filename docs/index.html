@@ -13,7 +13,7 @@
 
     <form id="signup-form">
       <label for="name">Name</label>
-      <input type="name" id="name" placeholder="Name" required />
+      <input type="text" id="name" placeholder="Name" required />
 
       <label for="email">Email</label>
       <input type="email" id="email" placeholder="you@student.ac.uk" required />
@@ -36,6 +36,11 @@
       createUserWithEmailAndPassword,
       updateProfile
     } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+      import {
+    getFirestore,
+    doc,
+    setDoc
+  } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const firebaseConfig = {
   apiKey: "AIzaSyDUPdCJIpj09iUSHL4Dm_ZwbYuHzzq_SmM",
@@ -48,7 +53,8 @@
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
-    
+    const db = getFirestore(app);
+
     const form = document.getElementById("signup-form");
 
     form.addEventListener("submit", async (e) => {
@@ -68,9 +74,11 @@
           displayName: name
         });
 
-        await setDoc(doc(db, "users", user.uid), {
+        await setDoc(doc(db, "users",  userCredential.user.uid), {
           name: name,
+          email:email,
           onboardingComplete: false,
+          createdAt: new Date()
         });
 
         window.location.href = "onboarding.html";

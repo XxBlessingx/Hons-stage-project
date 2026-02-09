@@ -112,11 +112,4 @@ logoutBtn.addEventListener("click", async () => {
 
 
 
-// making sure that new users move to the dashboard then the dashboard and that returning users go to the dashboard
-/*const userDoc = await getDoc(doc(db, "users", user.uid));
 
-if (!userDoc.exists() || !userDoc.data().onboardingComplete) {
-  window.location.href = "onboarding.html";
-} else {
-  window.location.href = "dashboard.html";
-}*/
