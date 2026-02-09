@@ -35,6 +35,12 @@ function showStep(index) {
   steps.forEach(step => step.classList.remove("active"));
   steps[index].classList.add("active");
 }
+ const user = auth.currentUser;
+
+if (!user) {
+  alert("Please sign in first");
+  window.location.href = "login.html";
+}
 
 // Run logic for each step
 steps.forEach((step, index) => {
@@ -77,10 +83,11 @@ finishBtn.addEventListener("click", async () => {
     await setDoc(doc(db, "users", user.uid), {
       ...onboardingData,
       onboardingComplete: true,
-      createdAt: serverTimestamp()
-    });
+      //createdAt: serverTimestamp()
+    },
+    {merge:true});
 
-    // After saving onboarding → go to dashboard
+    // After saving onboarding => go to dashboard
     window.location.href = "dashboard.html";
 
   } catch (error) {

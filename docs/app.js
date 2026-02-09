@@ -11,7 +11,11 @@ import {
 import {
   getFirestore,
   doc,
-  getDoc
+  getDoc,
+  addDoc,
+  collection,
+  getDocs,
+  deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 // Firebase config
@@ -52,6 +56,8 @@ onAuthStateChanged(auth, async (user) => {
   // User is authenticated + onboarded
   const userData = userSnap.data();
   welcomeEl.textContent = `Welcome, ${userData.name}`;
+// this is what is used to load the users habits 
+  loadHabits(user.uid);
 
 });
 
@@ -86,7 +92,7 @@ async function loadHabits(uid) {
 }
 
 
-//delete/edit a habit
+//delete and edit a habit
 function renderHabit(id, name, uid) {
   const li = document.createElement("li");
   li.textContent = name;
