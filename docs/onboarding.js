@@ -35,12 +35,12 @@ function showStep(index) {
   steps.forEach(step => step.classList.remove("active"));
   steps[index].classList.add("active");
 }
- const user = auth.currentUser;
+ //const user = auth.currentUser;
 
-if (!user) {
-  alert("Please sign in first");
-  window.location.href = "login.html";
-}
+//if (!user) {
+ // alert("Please sign in first");
+  //window.location.href = "login.html";
+//}
 
 // Run logic for each step
 steps.forEach((step, index) => {
