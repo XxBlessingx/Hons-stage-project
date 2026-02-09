@@ -77,13 +77,13 @@
 
       try {
         // 1. sign in user
-        await signInWithEmailAndPassword(auth, email, password);
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
         const userDoc =  await getDoc(doc(db, "users", user.uid));
         
         if (!userDoc.exists() || !userDoc.data().onboardingComplete)
-         {
-        //window.location.href = "dashboard.html";
+         {// meaning that new users go to onboarding 
+        window.location.href = "onboarding.html";
         } else {
         // If onboarding is complete, go to dashboard
         window.location.href = "dashboard.html";
