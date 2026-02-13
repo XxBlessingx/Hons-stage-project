@@ -376,3 +376,8 @@ h1 {
 .hidden {
   display: none;
 }
+.empty-state {
+ padding:2rem;
+ text-align: center;
+ font-weight: 600;
+}

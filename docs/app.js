@@ -41,6 +41,7 @@ const habitList = document.getElementById("habit-list");
 const openModalBtn = document.getElementById("open-modal");
 const modal = document.getElementById("habit-modal");
 const closeModalBtn = document.getElementById("close-modal");
+const emptyState = document.getElementById("empty-state");
 
 // AUTH GUARD + ONBOARDING CHECK
 onAuthStateChanged(auth, async (user) => {
@@ -72,9 +73,18 @@ async function loadHabits(uid) {
   const habitsRef = collection(db, "users", uid, "habits");
   const snapshot = await getDocs(habitsRef);
 
-  snapshot.forEach((docSnap) => {
-    renderHabit(docSnap.id, docSnap.data().name, uid);
-  });
+  //debugging
+  console.log("Snapshot empty:", snapshot.empty);
+
+  if (snapshot.empty) {
+    emptyState.classList.remove("hidden");
+  } else {
+    emptyState.classList.add("hidden");
+
+    snapshot.forEach((docSnap) => {
+      renderHabit(docSnap.id, docSnap.data().name, uid);
+    });
+  }
 }
 
 
@@ -89,6 +99,10 @@ function renderHabit(id, name, uid) {
   delBtn.addEventListener("click", async () => {
     await deleteDoc(doc(db, "users", uid, "habits", id));
     li.remove();
+
+    if(habitList.children.length === 0){
+      emptyState.classList.remove("hidden");
+    }
   });
 
   li.appendChild(delBtn);
@@ -111,6 +125,8 @@ if (saveHabitBtn) {
     );
 
     renderHabit(docRef.id, habitName, user.uid);
+
+    emptyState.classList.add("hidden");
 
     modalHabitInput.value = "";
     modal.classList.add("hidden");
@@ -138,8 +154,7 @@ if (cancelBtn) {
     modal.classList.add("hidden");
   });
 }
-modal.classList.add("hidden");
-document.getElementById("modal-habit-name").value = "";
+
 
 // LOGOUT
 logoutBtn.addEventListener("click", async () => {
