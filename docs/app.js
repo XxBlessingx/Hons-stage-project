@@ -35,9 +35,12 @@ const db = getFirestore(app);
 // Elements
 const welcomeEl = document.getElementById("welcome");
 const logoutBtn = document.getElementById("logout");
-const habitForm = document.getElementById("habit-form");
-const habitInput = document.getElementById("habit-name");
+//const habitForm = document.getElementById("habit-form");
+//const habitInput = document.getElementById("habit-name");
 const habitList = document.getElementById("habit-list");
+const openModalBtn = document.getElementById("open-modal");
+const modal = document.getElementById("habit-modal");
+const closeModalBtn = document.getElementById("close-modal");
 
 // AUTH GUARD + ONBOARDING CHECK
 onAuthStateChanged(auth, async (user) => {
@@ -61,23 +64,6 @@ onAuthStateChanged(auth, async (user) => {
 
 });
 
-// for adding a habit 
-habitForm.addEventListener("submit", async (e) => {
-  e.preventDefault();
-
-  const user = auth.currentUser;
-  if (!user) return;
-
-  const docRef = await addDoc(
-    collection(db, "users", user.uid, "habits"),
-    {
-      name: habitInput.value
-    }
-  );
-  
-  renderHabit(docRef.id, habitInput.value, user.uid);
-  habitInput.value = "";
-});
 
 //displaying the habit 
 async function loadHabits(uid) {
@@ -107,6 +93,43 @@ function renderHabit(id, name, uid) {
 
   li.appendChild(delBtn);
   habitList.appendChild(li);
+}
+const saveHabitBtn = document.getElementById("save-habit");
+const modalHabitInput = document.getElementById("modal-habit-name");
+
+if (saveHabitBtn) {
+  saveHabitBtn.addEventListener("click", async () => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const habitName = modalHabitInput.value.trim();
+    if (!habitName) return;
+
+    const docRef = await addDoc(
+      collection(db, "users", user.uid, "habits"),
+      { name: habitName }
+    );
+
+    renderHabit(docRef.id, habitName, user.uid);
+
+    modalHabitInput.value = "";
+    modal.classList.add("hidden");
+  });
+}
+
+
+// OPEN MODAL
+if (openModalBtn) {
+  openModalBtn.addEventListener("click", () => {
+    modal.classList.remove("hidden");
+  });
+}
+
+// CLOSE MODAL
+if (closeModalBtn) {
+  closeModalBtn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+  });
 }
 
 // LOGOUT

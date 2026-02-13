@@ -25,8 +25,22 @@
             <section class="habits">
                 <ul id="habit-list"></ul>
             </section> 
+            <button id="open-modal" class="floating-btn">+</button>
         </main>
-        
+        <div id="habit-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Add New Habit</h2>
+
+                <input
+                type="text"
+                id="modal-habit-name"
+                placeholder="e.g. Morning Exercise"
+                />
+                <button id="save-habit">Add Habit</button>
+                
+                <button id="close-modal-btn">Cancel</button>
+            </div>
+        </div>
         <script type="module" src="app.js"></script>
 
     </body>
