@@ -7,24 +7,24 @@
     </head>
 
     <body>
+        <!-- the navigation bar-->
+         <header class="top-nav">
+    <h2 class="logo">HabitIQ</h2>
+
+    <nav>
+      <a href="dashboard.html">Dashboard</a>
+      <a href="profile.html">Profile</a>
+      <a href="settings.html">Settings</a>
+    </nav>
+
+    <button id="logout" class="logout-btn">Log out</button>
+  </header>
+
         <main class="dashboard">
             <h1 id="welcome">Welcome</h1>
             <section class="habits">
-                <form id="habit-form">
-                    <input
-                    type="text"
-                    id="habit-name"
-                    placeholder="New habit (e.g. Brush teeth)"
-                    required
-                    />
-                    <button type="submit">Add Habit</button>
-                </form>
-
                 <ul id="habit-list"></ul>
-            </section>
-
-            <button id="logout"> Log out</button>
-            
+            </section> 
         </main>
         
         <script type="module" src="app.js"></script>
@@ -32,3 +32,7 @@
     </body>
 
 </html>
+<!-- what is to be added to this page 
+ - replace the current dash to have a button to + Add Habits
+ - have pages for the profile, settings
+ - add the calender, progress bar -->
