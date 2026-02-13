@@ -29,6 +29,7 @@
         </main>
         <div id="habit-modal" class="modal hidden">
             <div class="modal-content">
+                <span id="close-modal" class="close-btn">&times;</span>
                 <h2>Add New Habit</h2>
 
                 <input
@@ -36,9 +37,12 @@
                 id="modal-habit-name"
                 placeholder="e.g. Morning Exercise"
                 />
-                <button id="save-habit">Add Habit</button>
                 
-                <button id="close-modal-btn">Cancel</button>
+                <div class="modal-actions">
+                    <button id="cancel-habit" class="btn-secondary">Cancel</button>
+                    <button id="save-habit" class="btn-primary">Add Habit</button>
+                </div>
+    
             </div>
         </div>
         <script type="module" src="app.js"></script>

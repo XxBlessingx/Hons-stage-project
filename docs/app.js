@@ -118,6 +118,7 @@ if (saveHabitBtn) {
 }
 
 
+const cancelBtn = document.getElementById("cancel-habit");
 // OPEN MODAL
 if (openModalBtn) {
   openModalBtn.addEventListener("click", () => {
@@ -125,12 +126,20 @@ if (openModalBtn) {
   });
 }
 
-// CLOSE MODAL
+// CLOSE MODAL (x)
 if (closeModalBtn) {
   closeModalBtn.addEventListener("click", () => {
     modal.classList.add("hidden");
   });
 }
+// CLOSE MODAL (Cancel button)
+if (cancelBtn) {
+  cancelBtn.addEventListener("click", () => {
+    modal.classList.add("hidden");
+  });
+}
+modal.classList.add("hidden");
+document.getElementById("modal-habit-name").value = "";
 
 // LOGOUT
 logoutBtn.addEventListener("click", async () => {
