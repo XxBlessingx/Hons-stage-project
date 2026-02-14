@@ -36,13 +36,72 @@
             <div class="modal-content">
                 <span id="close-modal" class="close-btn">&times;</span>
                 <h2>Add New Habit</h2>
-
-                <input
-                type="text"
-                id="modal-habit-name"
-                placeholder="e.g. Morning Exercise"
-                />
                 
+                <!--Habit Name-->
+                <div class="form-group">
+                    <label>Habit Name</label>
+                    <input
+                    type="text"
+                    id="modal-habit-name"
+                    placeholder="e.g. Morning Exercise"
+                    />
+                </div>
+
+            <!-- Frequency-->
+            <div class="row">
+                <div class="form-group">
+                    <label>Frequency</label>
+                    <select id="habit-frequency">
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                </select>
+                </div>
+
+                <!--Difficulty-->
+
+                <div class="form-group">
+                <label>Difficulty</label>
+                <select id="habit-difficulty">
+                    <option value="easy">Easy</option>
+                    <option value="medium">Medium</option>
+                    <option value="hard">Hard</option>
+                </select>
+                </div>
+            </div>
+
+            <label>Direction</label>
+                <select id="habit-direction">
+                    <option value="build">Build a good habit</option>
+                    <option value="reduce">Reduce a bad habit</option>
+                </select>
+
+
+            <!-- Advanced Toggle -->
+            <button id="toggle-advanced" class="advanced-toggle">
+                Advanced Settings <span id="advanced-arrow">▼</span>
+            </button>
+
+            <!-- Advanced Section -->
+            <div id="advanced-section">
+                <div class="form-group">
+                <label>Impact Level</label>
+                <select id="habit-impact">
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                </select>
+                </div>
+
+                <div class="form-group">
+                <label>Why does this matter?</label>
+                <textarea
+                    id="habit-motivation"
+                    placeholder="Why does this matter to you?"
+                ></textarea>
+                </div>
+            </div>
+
+                <!--buttons-->
                 <div class="modal-actions">
                     <button id="cancel-habit" class="btn-secondary">Cancel</button>
                     <button id="save-habit" class="btn-primary">Add Habit</button>
