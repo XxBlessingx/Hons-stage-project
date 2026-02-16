@@ -18,6 +18,8 @@ import {
   deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
+import { updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
 // Firebase config
 const firebaseConfig = {
    apiKey: "AIzaSyDUPdCJIpj09iUSHL4Dm_ZwbYuHzzq_SmM",
@@ -45,6 +47,8 @@ const emptyState = document.getElementById("empty-state");
 const toggleAdvancedBtn = document.getElementById("toggle-advanced");
 const advancedSection = document.getElementById("advanced-section");
 const advancedArrow = document.getElementById("advanced-arrow");
+
+let editingHabitId = null;
 
 if (toggleAdvancedBtn) {
   toggleAdvancedBtn.addEventListener("click", () => {
@@ -129,6 +133,25 @@ function renderHabit(id, name, uid) {
   const actions = document.createElement("div");
   actions.classList.add("habit-actions");
 
+  const editBtn = document.createElement("button");
+  editBtn.textContent = "Edit";
+  editBtn.classList.add("action-btn")
+
+  editBtn.addEventListener("click", async () => {
+  const habitSnap = await getDoc(doc(db, "users", uid, "habits", id));
+  const habitData = habitSnap.data();
+
+  document.getElementById("modal-habit-name").value = habitData.name;
+  document.getElementById("habit-frequency").value = habitData.frequency;
+  document.getElementById("habit-difficulty").value = habitData.difficulty;
+  document.getElementById("habit-impact").value = habitData.impact || "low";
+  document.getElementById("habit-motivation").value = habitData.motivation || "";
+
+  editingHabitId = id;
+
+  modal.classList.remove("hidden");
+});
+
   const delBtn = document.createElement("button");
   delBtn.textContent = "Delete";
   delBtn.classList.add("delete-btn");
@@ -137,12 +160,14 @@ function renderHabit(id, name, uid) {
     await deleteDoc(doc(db, "users", uid, "habits", id));
     habitCard.remove();
 
-    if (habitList.children.length === 0) {
-      document.getElementById("empty-state").classList.remove("hidden");
+   if (habitList.children.length === 0) {
+      emptyState.classList.remove("hidden");
     }
   });
 
+  actions.appendChild(editBtn);
   actions.appendChild(delBtn);
+
   habitCard.appendChild(title);
   habitCard.appendChild(actions);
 
@@ -160,26 +185,43 @@ if (saveHabitBtn) {
     const habitName = modalHabitInput.value.trim();
     if (!habitName) return;
 
-    const docRef = await addDoc(
-      collection(db, "users", user.uid, "habits"),
-      { name: habitName,
-        direction:document.getElementById("habit-direction").value,
-        frequency: document.getElementById("habit-frequency").value,
-        difficulty: document.getElementById("habit-difficulty").value,
-        impact: document.getElementById("habit-impact").value || null,
-        motivation: document.getElementById("habit-motivation").value || null,
-        createdAt: new Date()
-       }
-    );
+    if (editingHabitId) {
+      // ✏️ UPDATE EXISTING HABIT
+      await updateDoc(
+        doc(db, "users", user.uid, "habits", editingHabitId),
+        {
+          name: habitName,
+          frequency: document.getElementById("habit-frequency").value,
+          difficulty: document.getElementById("habit-difficulty").value,
+          impact: document.getElementById("habit-impact").value || null,
+          motivation: document.getElementById("habit-motivation").value || null,
+        }
+      );
 
-    renderHabit(docRef.id, habitName, user.uid);
-      modalHabitInput.value = "";
-      modal.classList.add("hidden");
+      editingHabitId = null;
 
-    // Close advanced section if open
-    advancedSection?.classList.remove("open");
-    advancedArrow?.classList.remove("rotate");
+      loadHabits(user.uid); // reload to show updated values
 
+    } else {
+      // ➕ CREATE NEW HABIT
+      const docRef = await addDoc(
+        collection(db, "users", user.uid, "habits"),
+        {
+          name: habitName,
+          frequency: document.getElementById("habit-frequency").value,
+          difficulty: document.getElementById("habit-difficulty").value,
+          impact: document.getElementById("habit-impact").value || null,
+          motivation: document.getElementById("habit-motivation").value || null,
+          createdAt: new Date()
+        }
+      );
+
+      renderHabit(docRef.id, habitName, user.uid);
+    }
+
+    // Reset modal
+    modalHabitInput.value = "";
+    modal.classList.add("hidden");
     emptyState.classList.add("hidden");
   });
 }
