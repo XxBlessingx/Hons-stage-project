@@ -80,7 +80,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // for displaying habits 
-async function loadHabits(uid) {
+/*async function loadHabits(uid) {
   habitList.innerHTML = "";
 
   const habitsRef = collection(db, "users", uid, "habits");
@@ -99,7 +99,49 @@ async function loadHabits(uid) {
       renderHabit(docSnap.id, docSnap.data(), uid);
     });
   }
+}*/
+// just trying something 
+async function loadHabits(uid) {
+  habitList.innerHTML = "";
+
+  const habitsRef = collection(db, "users", uid, "habits");
+  const snapshot = await getDocs(habitsRef);
+
+  //debugging check
+  console.log("Snapshot empty:", snapshot.empty);
+
+  if (snapshot.empty) {
+    emptyState.classList.remove("hidden");
+    emptyState.innerHTML = `<p>Why not try adding your first habit?</p>`;
+    return;
+  }
+  
+  const today = new Date().toISOString().split("T")[0];
+  let hasIncompleteHabits = false;
+  
+  snapshot.forEach((docSnap) => {
+    const habitData = docSnap.data();
+    const completions = habitData.completions || {};
+    
+    // Only show habits NOT completed today
+    if (!completions[today]) {
+      renderHabit(docSnap.id, habitData, uid);
+      hasIncompleteHabits = true;
+    }
+  });
+  
+  // If all habits are completed for today
+  if (!hasIncompleteHabits) {
+    emptyState.classList.remove("hidden");
+    emptyState.innerHTML = `
+      <p>🎉 All done for today! Great job!</p>
+      <p>Check your <a href="all-habits.html">All Habits</a> page to see your complete list.</p>
+    `;
+  } else {
+    emptyState.classList.add("hidden");
+  }
 }
+
 
 //delete and edit a habit
 /*function renderHabit(id, name, uid) {
@@ -236,13 +278,32 @@ function renderHabit(id, habitData, uid) {
     if (updatedCompletions[today]) {
       delete updatedCompletions[today];
       completeCircle.classList.remove("completed");
-    } else {
-      updatedCompletions[today] = true;
-      completeCircle.classList.add("completed");
-    }
+    }  else {
+    // Mark as complete
+    updatedCompletions[today] = true;
+    completeCircle.classList.add("completed");
+    
+    // Add fade-out animation
+    habitCard.style.transition = "all 0.3s ease";
+    habitCard.style.opacity = "0";
+    habitCard.style.transform = "translateX(20px)";
+    
+    // Wait for animation, then remove from DOM
+    setTimeout(() => {
+      habitCard.remove();
+      
+      // Check if there are any habits left
+      if (habitList.children.length === 0) {
+        emptyState.classList.remove("hidden");
+        emptyState.innerHTML = `
+          <p>🎉 All done for today! Great job!</p>
+          <p>Check your <a href="all-habits.html">All Habits</a> page to see your complete list.</p>`;
+      }
+}, 300);
+  }
 
-    await updateDoc(habitRef, { completions: updatedCompletions });
-  });
+  await updateDoc(habitRef, { completions: updatedCompletions });
+});
 
   // Button Container (hidden by default, shows on hover)
   const buttonContainer = document.createElement("div");

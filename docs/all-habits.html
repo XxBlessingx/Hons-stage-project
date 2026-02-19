@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0">
+        <title> HabitIQ | All Habits</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+  <nav class="app-nav">
+    <div class="nav-links">
+      <a href="dashboard.html" class="nav-link"> Current Habits </a>
+    </div>
+  </nav>
+
+  <main class="dashboard">
+    <h1>All Habits</h1>
+    <p class="subtitle">Manage your habits and track your progress</p>
+
+    <!-- Search and Filter -->
+    <div class="habit-filters">
+      <input 
+        type="text" 
+        id="search-habits" 
+        placeholder="Search habits..."
+        class="search-input"
+      />
+      
+      <select id="category-filter" class="category-filter">
+        <option value="all">All Categories</option>
+        <option value="📚">📚 Study</option>
+        <option value="💪">💪 Fitness</option>
+        <option value="🥗">🥗 Nutrition</option>
+        <option value="🧘">🧘 Mindfulness</option>
+        <option value="💤">💤 Sleep</option>
+        <option value="📖">📖 Reading</option>
+        <option value="✍️">✍️ Writing</option>
+        <option value="🎯">🎯 Goal</option>
+        <option value="🧹">🧹 Cleaning</option>
+        <option value="💰">💰 Finance</option>
+        <option value="👥">👥 Social</option>
+        <option value="🎨">🎨 Creative</option>
+        <option value="🌱">🌱 Growth</option>
+      </select>
+    </div>
+
+    <!-- Habits Container -->
+    <div id="all-habits-container" class="habits-container">
+      <!-- Habits will be loaded here -->
+    </div>
+
+    <div id="empty-state" class="empty-state hidden">
+      <p>No habits yet. Create your first habit!</p>
+      <button id="open-modal" class="primary-btn">+ Create Habit</button>
+    </div>
+      <button id="open-modal" class="floating-btn">+</button>
+  </main>
+
+  <!-- Habit Modal (copied from dashboard.html) -->
+  <div id="habit-modal" class="modal hidden">
+    <div class="modal-content">
+      <span id="close-modal" class="close-btn">&times;</span>
+      <h2>Add New Habit</h2>
+      
+      <!-- Habit Name -->
+      <div class="form-group">
+        <label>Habit Name</label>
+        <input
+          type="text"
+          id="modal-habit-name"
+          placeholder="e.g. Morning Exercise"
+        />
+      </div>
+
+      <!-- Frequency and Difficulty Row -->
+      <div class="row">
+        <div class="form-group">
+          <label>Frequency</label>
+          <select id="habit-frequency">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Difficulty</label>
+          <select id="habit-difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium">Medium</option>
+            <option value="hard">Hard</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Direction -->
+      <div class="form-group">
+        <label>Direction</label>
+        <select id="habit-direction">
+          <option value="build">Build a good habit</option>
+          <option value="reduce">Reduce a bad habit</option>
+        </select>
+      </div>
+
+      <!-- Category -->
+      <div class="form-group">
+        <label for="habit-category">Category</label>
+        <select id="habit-category">
+          <option value="📚">📚 Study</option>
+          <option value="💪">💪 Fitness</option>
+          <option value="🥗">🥗 Nutrition</option>
+          <option value="🧘">🧘 Mindfulness</option>
+          <option value="💤">💤 Sleep</option>
+          <option value="💧">💧 Hydration</option>
+          <option value="📖">📖 Reading</option>
+          <option value="✍️">✍️ Writing</option>
+          <option value="🎯">🎯 Goal</option>
+          <option value="🧹">🧹 Cleaning</option>
+          <option value="💰">💰 Finance</option>
+          <option value="👥">👥 Social</option>
+          <option value="🎨">🎨 Creative</option>
+          <option value="⚕️">⚕️ Health</option>
+          <option value="🌱">🌱 Personal Growth</option>
+        </select>
+      </div>
+
+      <!-- Advanced Toggle -->
+      <button id="toggle-advanced" class="advanced-toggle">
+        Advanced Settings <span id="advanced-arrow">▼</span>
+      </button>
+
+      <!-- Advanced Section -->
+      <div id="advanced-section">
+        <div class="form-group">
+          <label>Impact Level</label>
+          <select id="habit-impact">
+            <option value="low">Low</option>
+            <option value="medium">Medium</option>
+            <option value="high">High</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Why does this matter?</label>
+          <textarea
+            id="habit-motivation"
+            placeholder="Why is this important?"
+          ></textarea>
+        </div>
+      </div>
+
+    <button id="logout" class="logout-btn">Log out</button>
+  </main>
+  
+  <div class="modal-actions">
+        <button id="cancel-habit" class="btn-secondary">Cancel</button>
+        <button id="save-habit" class="btn-primary">Add Habit</button>
+      </div>
+    </div>
+  </div>
+  <!-- Include your existing modal for creating/editing habits -->
+  <!-- (Copy your modal from dashboard.html here) -->
+
+
+  <script type="module" src="all-habits.js"></script>
+</body>
+</html>

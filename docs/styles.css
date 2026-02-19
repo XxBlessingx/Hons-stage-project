@@ -987,3 +987,64 @@ h1 {
     justify-content: flex-end;
   }
 }
+.filters-section {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  background: white;
+  padding: 1rem;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.search-input {
+  flex: 2;
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.category-filter {
+  flex: 1;
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: white;
+}
+
+.completion-stats {
+  font-size: 0.85rem;
+  color: #4caf50;
+  background: #e8f5e9;
+  padding: 0.3rem 0.75rem;
+  border-radius: 20px;
+  margin-right: 0.5rem;
+  white-space: nowrap;
+}
+
+/* Active navigation link */
+.top-nav nav a.active {
+  background: #3f51b5;
+  color: white;
+}
+
+.top-nav nav a {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  transition: all 0.2s;
+}
+
+.top-nav nav a:hover {
+  background: #f0f0f0;
+}
+
+.top-nav nav a.active:hover {
+  background: #303f9f;
+}
+
+/* Ensure habit cards in All Habits page match your design */
+.all-habits-card .habit-right {
+  gap: 0.5rem;
+}
