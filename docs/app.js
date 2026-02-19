@@ -130,6 +130,22 @@ function renderHabit(id, habitData, uid) {
   const leftSection = document.createElement("div");
   leftSection.classList.add("habit-left");
 
+   const titleRow = document.createElement("div");
+  titleRow.classList.add("habit-title-row");
+
+  // Add category icon if it exists
+  if (habitData.category) {
+    const iconSpan = document.createElement("span");
+    iconSpan.classList.add("habit-icon");
+    iconSpan.textContent = habitData.category;
+    titleRow.appendChild(iconSpan);
+  } else {
+    // Default icon if none selected
+    const iconSpan = document.createElement("span");
+    iconSpan.classList.add("habit-icon");
+    iconSpan.textContent = "📌";
+    titleRow.appendChild(iconSpan);
+  }
   // Habit name
   const title = document.createElement("h3");
   title.textContent = habitData.name;
@@ -138,6 +154,35 @@ function renderHabit(id, habitData, uid) {
   // Frequency and difficulty
   const metaRow = document.createElement("div");
   metaRow.classList.add("habit-meta");
+   
+  // Category as text badge (if you want both icon and text)
+  if (habitData.category) {
+    const categoryBadge = document.createElement("span");
+    categoryBadge.classList.add("category-badge");
+    
+    // Map icons to category names for display
+    const categoryNames = {
+      "📚": "Study",
+      "💪": "Fitness",
+      "🥗": "Nutrition",
+      "🧘": "Mindfulness",
+      "💤": "Sleep",
+      "💧": "Hydration",
+      "📖": "Reading",
+      "✍️": "Writing",
+      "🎯": "Goal",
+      "🧹": "Cleaning",
+      "💰": "Finance",
+      "👥": "Social",
+      "🎨": "Creative",
+      "⚕️": "Health",
+      "🌱": "Growth"
+    };
+    
+    const categoryName = categoryNames[habitData.category] || "Other";
+    categoryBadge.textContent = `${habitData.category} ${categoryName}`;
+    metaRow.appendChild(categoryBadge);
+  }
 
   if (habitData.difficulty) {
     const difficultyBadge = document.createElement("span");
@@ -237,14 +282,11 @@ function renderHabit(id, habitData, uid) {
     }
   });
 
-  // Assemble right section
+  
   buttonContainer.appendChild(editBtn);
   buttonContainer.appendChild(delBtn);
-  
   rightSection.appendChild(completeCircle);
   rightSection.appendChild(buttonContainer);
-
-  // ===== ASSEMBLE CARD =====
   habitCard.appendChild(leftSection);
   habitCard.appendChild(rightSection);
   habitList.appendChild(habitCard);
@@ -262,7 +304,6 @@ if (saveHabitBtn) {
     if (!habitName) return;
 
     if (editingHabitId) {
-      // ✏️ UPDATE EXISTING HABIT
       await updateDoc(
         doc(db, "users", user.uid, "habits", editingHabitId),
         {
@@ -271,21 +312,24 @@ if (saveHabitBtn) {
           difficulty: document.getElementById("habit-difficulty").value,
           impact: document.getElementById("habit-impact").value || null,
           motivation: document.getElementById("habit-motivation").value || null,
+          category: document.getElementById("habit-category").value 
         }
       );
 
+      
+
       editingHabitId = null;
-      loadHabits(user.uid); // reload to show updated values
+      loadHabits(user.uid);
 
     } else {
-      // ✨ CREATE NEW HABIT
       const habitData = {
         name: habitName,
         frequency: document.getElementById("habit-frequency").value,
         difficulty: document.getElementById("habit-difficulty").value,
         impact: document.getElementById("habit-impact").value || null,
         motivation: document.getElementById("habit-motivation").value || null,
-        completions: {}, // Initialize empty completions object
+        category: document.getElementById("habit-category").value,
+        completions: {}, 
         createdAt: new Date()
       };
       
@@ -301,7 +345,7 @@ if (saveHabitBtn) {
       }, user.uid);
     }
 
-    // Reset modal
+    
     modalHabitInput.value = "";
     modal.classList.add("hidden");
     emptyState.classList.add("hidden");
