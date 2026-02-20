@@ -23,6 +23,30 @@
 
         <main class="dashboard">
             <h1 id="welcome">Welcome</h1>
+            <!-- adding the streak counter (progress bar rn)-->
+             <div class="streak-header">
+                <div class="streak-counter">
+                    <span class="fire-icon">🔥</span>
+                    <span class="streak-number" id="current-streak">0</span>
+                    <span class="streak-label">day streak</span>
+                </div>
+                <div class="daily-goal">
+                    <div class="goal-text">
+                        <span id="completed-count">0</span> / <span id="total-count">0</span> Daily goal
+                    </div>
+                    <div class="goal-progress-bar">
+                        <div class="goal-progress-fill" id="goal-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="streak-message" id="streak-message"> 🔥 you're on fire!
+                </div>
+            </div>
+            <!--weekly calender-->
+            <div class="weekly-calendar">
+                <div class="calendar-header">THIS WEEK</div>
+                <div class="week-days" id="week-days"></div>
+            </div>
+            
             <section class="habits">
                 <ul id="habit-list"></ul>
                 
