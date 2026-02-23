@@ -1295,3 +1295,12 @@ h1 {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
+
+.streak-badge {
+  background: #ffe9b3;
+  color: #a66b00;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}

@@ -1,7 +1,7 @@
 // Will be using this for the dashboard logic//
 //import {initializeApp} from
 // app.js — dashboard logic only
-import { ProgressTracker } from "./progress-tracker.js";
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getAuth,
@@ -47,12 +47,7 @@ const emptyState = document.getElementById("empty-state");
 const toggleAdvancedBtn = document.getElementById("toggle-advanced");
 const advancedSection = document.getElementById("advanced-section");
 const advancedArrow = document.getElementById("advanced-arrow");
-const streakNumber = document.getElementById('current-streak');
-const completedCount = document.getElementById('completed-count');
-const totalCount = document.getElementById('total-count');
-const goalProgress = document.getElementById('goal-progress');
-const streakMessage = document.getElementById('streak-message');
-const weekDaysContainer = document.getElementById('week-days');
+
 
 let editingHabitId = null;
 
@@ -94,23 +89,36 @@ async function loadHabits(uid) {
   const habitsRef = collection(db, "users", uid, "habits");
   const snapshot = await getDocs(habitsRef);
 
-  if (snapshot.empty) {
-    emptyState.classList.remove("hidden");
-    updateProgressStats([]);
-    return;
-  }
-
-  emptyState.classList.add("hidden");
-
   const habits = [];
+  const today = new Date().toISOString().split("T")[0];
 
   snapshot.forEach((docSnap) => {
     const habitData = docSnap.data();
     habits.push(habitData);
-    renderHabit(docSnap.id, habitData, uid);
+
+    // Only render habits NOT completed today
+    if (!habitData.completions || !habitData.completions[today]) {
+      renderHabit(docSnap.id, habitData, uid);
+    }
   });
 
-  updateProgressStats(habits);
+ // updateProgressStats(habits);
+
+  // 🔥 THIS is where your "All done" message belongs
+  if (habitList.children.length === 0 && habits.length > 0) {
+    emptyState.classList.remove("hidden");
+    emptyState.innerHTML = `
+      <p>🎉 All done for today! Great job!</p>
+      <p>Check your <a href="all-habits.html">All Habits</a> page to see your complete list.</p>
+    `;
+  } else if (habits.length === 0) {
+    emptyState.classList.remove("hidden");
+    emptyState.innerHTML = `
+      <p>Why not try adding your first habit?</p>
+    `;
+  } else {
+    emptyState.classList.add("hidden");
+  }
 }
 
 function updateProgressStats(habits) {
@@ -209,128 +217,6 @@ function renderWeeklyCalendar(habits) {
 
 
 
-// function used to update all the progress displays
-/*function updateProgressDisplay(habits, uid) {
-  const tracker = new ProgressTracker(habits);
-  
-  // Update streak
-  const streak = tracker.calculateStreak();
-  streakNumber.textContent = streak;
-  
-  // Update daily progress
-  const progress = tracker.calculateDailyProgress();
-  completedCount.textContent = progress.completed;
-  totalCount.textContent = progress.total;
-  goalProgress.style.width = `${progress.percentage}%`;
-  
-  // Update streak message
-  streakMessage.textContent = tracker.getStreakMessage(streak);
-  
-  // Update weekly calendar
- updateWeeklyCalendar(tracker);
-  
-  // Check for milestone unlocks
-  const milestones = tracker.checkMilestones(streak);
-  if (milestones.length > 0) {
-    showMilestoneCelebration(milestones);
-  }
-}*/
-
-
-// update and interate through  weekly calendar
-/*function renderWeekCalendar(weekDays) {
-  weekDaysContainer.innerHTML = '';
-  
-  weekDays.forEach(day => {
-    const dayElement = document.createElement('div');
-    dayElement.classList.add('week-day', day.status);
-    
-    dayElement.innerHTML = `
-      <div class="day-name">${day.dayName}</div>
-      <div class="day-indicator"></div>
-      ${day.status === 'complete' ? '<span class="check">✓</span>' : ''}
-    `;
-    
-    // Add tooltip with percentage
-    dayElement.title = `${Math.round(day.percentage)}% complete`;
-    
-    weekDaysContainer.appendChild(dayElement);
-  });
-}*/
-
-function updateWeeklyCalendar(tracker) {
-  const weekDaysContainer = document.getElementById('week-days');
-  if (!weekDaysContainer) return;
-  
-  const weekDays = tracker.getWeekDays();
-  
-  weekDaysContainer.innerHTML = '';
-  
-  weekDays.forEach(day => {
-    const dayElement = document.createElement('div');
-    dayElement.classList.add('week-day', day.status);
-    
-    dayElement.innerHTML = `
-      <div class="day-name">${day.dayName}</div>
-      <div class="day-indicator"></div>
-      ${day.status === 'complete' ? '<span class="check">✓</span>' : ''}
-    `;
-    
-    // Add tooltip with percentage
-    dayElement.title = `${Math.round(day.percentage)}% complete`;
-    
-    weekDaysContainer.appendChild(dayElement);
-  });
-}
-
-// Show celebration for milestone unlocks
-function showMilestoneCelebration(milestones) {
-  const latestMilestone = milestones[milestones.length - 1];
-  
-  // Create a celebration modal
-  const celebrationModal = document.createElement('div');
-  celebrationModal.classList.add('celebration-modal');
-  
-  let message = '';
-  let gift = '';
-  
-  if (latestMilestone === 7) {
-    message = "🎉 7 day streak! That's one week!";
-    gift = "You've unlocked: Consistency Badge";
-  } else if (latestMilestone === 14) {
-    message = "🎉 14 day streak! Two weeks straight!";
-    gift = "You've unlocked: Dedication Badge";
-  } else if (latestMilestone === 30) {
-    message = "🏆 30 day streak! You've built a habit!";
-    gift = "You've unlocked: Habit Master Badge";
-  } else if (latestMilestone === 100) {
-    message = "💯 100 day streak! You're a legend!";
-    gift = "You've unlocked: Legendary Badge";
-  }
-  
-  celebrationModal.innerHTML = `
-    <div class="celebration-content">
-      <h2>${message}</h2>
-      <div class="gift-box">🎁</div>
-      <p>${gift}</p>
-      <button class="btn-primary" onclick="this.parentElement.parentElement.remove()">
-        Continue
-      </button>
-    </div>
-  `;
-  
-  document.body.appendChild(celebrationModal);
-  
-  // Auto-remove after 5 seconds
-  setTimeout(() => {
-    if (celebrationModal.parentElement) {
-      celebrationModal.remove();
-    }
-  }, 5000);
-}
-
-
-
 function renderHabit(id, habitData, uid) {
   const habitCard = document.createElement("div");
   habitCard.classList.add("habit-card");
@@ -358,6 +244,13 @@ function renderHabit(id, habitData, uid) {
   // Meta row (category, difficulty, frequency)
   const metaRow = document.createElement("div");
   metaRow.classList.add("habit-meta");
+
+  if (habitData.streak > 0) {
+  const streakBadge = document.createElement("span");
+  streakBadge.classList.add("streak-badge");
+  streakBadge.textContent = `🔥 ${habitData.streak} day streak`;
+  metaRow.appendChild(streakBadge);
+  }
 
   // Category badge
   if (habitData.category) {
@@ -422,44 +315,42 @@ function renderHabit(id, habitData, uid) {
   }
 
   // ===== COMPLETION CLICK HANDLER =====
-  completeCircle.addEventListener("click", async (e) => {
-    e.stopPropagation();
-    
-    const habitRef = doc(db, "users", uid, "habits", id);
-    const habitSnap = await getDoc(habitRef);
-    const updatedData = habitSnap.data();
-    const updatedCompletions = updatedData.completions || {};
+completeCircle.addEventListener("click", async (e) => {
+  e.stopPropagation();
 
-    if (updatedCompletions[today]) {
-      // Mark as incomplete (optional - you can remove this if you want)
-      delete updatedCompletions[today];
-      completeCircle.classList.remove("completed");
-      await updateDoc(habitRef, { completions: updatedCompletions });
-    } else {
-      // Mark as complete
-      updatedCompletions[today] = true;
-      await updateDoc(habitRef, { completions: updatedCompletions });
-      
-      // Add fade-out animation
-      habitCard.style.transition = "all 0.3s ease";
-      habitCard.style.opacity = "0";
-      habitCard.style.transform = "translateX(20px)";
-      
-      // Remove from DOM after animation
-      setTimeout(() => {
-        habitCard.remove();
-        
-        // Check if there are any habits left
-        if (habitList.children.length === 0) {
-          emptyState.classList.remove("hidden");
-          emptyState.innerHTML = `
-            <p>🎉 All done for today! Great job!</p>
-            <p>Check your <a href="all-habits.html">All Habits</a> page to see your complete list.</p>
-          `;
-        }
-      }, 300);
-    }
+  const habitRef = doc(db, "users", uid, "habits", id);
+  const habitSnap = await getDoc(habitRef);
+  const habit = habitSnap.data();
+
+  const today = new Date().toISOString().split("T")[0];
+  const yesterdayDate = new Date();
+  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
+  const yesterday = yesterdayDate.toISOString().split("T")[0];
+
+  let updatedStreak = habit.streak || 0;
+
+  if (habit.lastCompletedDate === today) {
+    return; // already completed today
+  }
+
+  if (habit.lastCompletedDate === yesterday) {
+    updatedStreak += 1;
+  } else {
+    updatedStreak = 1;
+  }
+
+  await updateDoc(habitRef, {
+    completions: {
+      ...(habit.completions || {}),
+      [today]: true
+    },
+    streak: updatedStreak,
+    lastCompletedDate: today
   });
+
+ 
+  await loadHabits(uid);
+});
 
   // Button container (hidden by default, shows on hover)
   const buttonContainer = document.createElement("div");
@@ -484,6 +375,8 @@ function renderHabit(id, habitData, uid) {
     modal.classList.remove("hidden");
   });
 
+  
+
   // Delete button
   const delBtn = document.createElement("button");
   delBtn.textContent = "🗑";
@@ -493,7 +386,7 @@ function renderHabit(id, habitData, uid) {
   delBtn.addEventListener("click", async () => {
     if (confirm("Are you sure you want to delete this habit?")) {
       await deleteDoc(doc(db, "users", uid, "habits", id));
-      habitCard.remove();
+      //habitCard.remove();
 
       if (habitList.children.length === 0) {
         emptyState.classList.remove("hidden");
@@ -543,7 +436,7 @@ if (saveHabitBtn) {
       loadHabits(user.uid); // reload to show updated values
 
     } else {
-      // ✨ CREATE NEW HABIT
+      //  CREATE NEW HABIT
       const habitData = {
         name: habitName,
         frequency: document.getElementById("habit-frequency").value,
@@ -552,6 +445,8 @@ if (saveHabitBtn) {
         motivation: document.getElementById("habit-motivation").value || null,
         category: document.getElementById("habit-category").value,
         completions: {}, // Initialize empty completions object
+        streak:0,
+        lastCompletedDate: null,
         createdAt: new Date()
       };
       
