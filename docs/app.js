@@ -34,7 +34,6 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-
 // Elements
 const welcomeEl = document.getElementById("welcome");
 const logoutBtn = document.getElementById("logout");
@@ -76,41 +75,8 @@ onAuthStateChanged(auth, async (user) => {
   // User is authenticated + onboarded
   const userData = userSnap.data();
   welcomeEl.textContent = `Welcome, ${userData.name}`;
-  
-  const userRef = doc(db, "users", user.uid);
-
- const today = new Date().toISOString().split("T")[0];
-  const yesterdayDate = new Date();
-  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-  const yesterday = yesterdayDate.toISOString().split("T")[0];
- 
-
-  let engagementStreak = userData.engagementStreak || 0;
-  const lastActiveDate = userData.lastActiveDate;
-
-  if (lastActiveDate !== today) {
-
-    if (lastActiveDate === yesterday) {
-      engagementStreak += 1;
-    } else {
-      engagementStreak = 1;
-    }
-
-    await updateDoc(userRef, {
-      engagementStreak,
-      lastActiveDate: today
-    });
-  }
-
-  // Update streak display
-  document.getElementById("current-streak").textContent =
-    engagementStreak;
-
+// this is what is used to load the users habits 
   loadHabits(user.uid);
-
- await updateGlobalStreak(user.uid);
-
-
 
 });
 
@@ -123,32 +89,36 @@ async function loadHabits(uid) {
   const habitsRef = collection(db, "users", uid, "habits");
   const snapshot = await getDocs(habitsRef);
 
-  const habits = [];
   const today = new Date().toISOString().split("T")[0];
+  const allHabits = [];
 
   snapshot.forEach((docSnap) => {
     const habitData = docSnap.data();
-    habits.push(habitData);
-
-    // Only render habits NOT completed today
-    if (!habitData.completions || !habitData.completions[today]) {
-      renderHabit(docSnap.id, habitData, uid);
-    }
+    allHabits.push({ id: docSnap.id, ...habitData });
   });
 
- updateProgressStats(habits);
+  // IMPORTANT — always calculate from all habits
+  updateProgressStats(allHabits);
 
-  // 🔥 THIS is where your "All done" message belongs
-  if (habitList.children.length === 0 && habits.length > 0) {
+  const incomplete = allHabits.filter(habit =>
+    !habit.completions || !habit.completions[today]
+  );
+
+  incomplete.forEach(habit => {
+    renderHabit(habit.id, habit, uid);
+  });
+
+  // Empty state
+  if (incomplete.length === 0 && allHabits.length > 0) {
     emptyState.classList.remove("hidden");
     emptyState.innerHTML = `
-      <p>🎉 All done for today! Great job!</p>
-      <p>Check your <a href="all-habits.html">All Habits</a> page to see your complete list.</p>
+      <p>🎉 All habits completed for today!</p>
+      <p><a href="all-habits.html">View all habits</a></p>
     `;
-  } else if (habits.length === 0) {
+  } else if (allHabits.length === 0) {
     emptyState.classList.remove("hidden");
     emptyState.innerHTML = `
-      <p>Why not try adding your first habit?</p>
+      <p>Why not add your first habit?</p>
     `;
   } else {
     emptyState.classList.add("hidden");
@@ -247,102 +217,6 @@ function renderWeeklyCalendar(habits) {
 
     container.appendChild(dayEl);
   });
-}
-// for the calender
-// ===== GLOBAL STREAK FUNCTION =====
-async function updateGlobalStreak(uid) {
-  console.log("Updating global streak for user:", uid);
-  
-  const userRef = doc(db, "users", uid);
-  const userSnap = await getDoc(userRef);
-  
-  if (!userSnap.exists()) {
-    console.log("User document doesn't exist");
-    return;
-  }
-  
-  const userData = userSnap.data();
-  
-  const today = new Date().toISOString().split("T")[0];
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
-  
-  console.log("Today:", today, "Yesterday:", yesterday);
-  console.log("Last active:", userData.lastActiveDate);
-  
-  // Check if user completed ANY habit today
-  let completedToday = false;
-  
-  const habitsRef = collection(db, "users", uid, "habits");
-  const snapshot = await getDocs(habitsRef);
-  
-  snapshot.forEach((docSnap) => {
-    const habitData = docSnap.data();
-    if (habitData.completions && habitData.completions[today]) {
-      completedToday = true;
-      console.log("Found completed habit today:", habitData.name);
-    }
-  });
-  
-  console.log("Completed any habit today?", completedToday);
-  
-  // Get current streak from Firestore
-  let currentStreak = userData.globalStreak || 0;
-  console.log("Current streak in DB:", currentStreak);
-  
-  // Don't update if already recorded for today
-  if (userData.lastActiveDate === today) {
-    console.log("Already updated today, keeping streak at:", currentStreak);
-    document.getElementById("current-streak").textContent = currentStreak;
-    updateStreakMessage(currentStreak);
-    return currentStreak;
-  }
-  
-  let newStreak = currentStreak;
-  
-  if (completedToday) {
-    if (userData.lastActiveDate === yesterday) {
-      // Consecutive day
-      newStreak = currentStreak + 1;
-      console.log("Consecutive day! Streak increased to:", newStreak);
-    } else {
-      // New streak (either first day or broken streak)
-      newStreak = 1;
-      console.log("New streak started at: 1");
-    }
-    
-    // Update Firestore
-    await updateDoc(userRef, {
-      globalStreak: newStreak,
-      lastActiveDate: today
-    });
-    console.log("Updated Firestore with streak:", newStreak);
-  } else {
-    console.log("No habits completed today, streak unchanged");
-  }
-  
-  // Update UI
-  document.getElementById("current-streak").textContent = newStreak;
-  updateStreakMessage(newStreak);
-  
-  return newStreak;
-}
-
-// Helper function for streak messages
-function updateStreakMessage(streak) {
-  // for debugging
-  console.log("Updating streak message with value:", streak);
-  const streakMessageEl = document.getElementById("streak-message");
-  if (!streakMessageEl) return;
-  
-  if (streak === 0) streakMessageEl.textContent = "Start your streak today!";
-  else if (streak === 1) streakMessageEl.textContent = "🔥 First day! Keep it going!";
-  else if (streak === 2) streakMessageEl.textContent = "🔥 2 days! You're building momentum!";
-  else if (streak === 3) streakMessageEl.textContent = "🔥 3 days! Great start!";
-  else if (streak === 4) streakMessageEl.textContent = "🔥 4 days! You're on a roll!";
-  else if (streak === 5) streakMessageEl.textContent = "🔥 5 days! Halfway to a week!";
-  else if (streak === 6) streakMessageEl.textContent = "🔥 6 days! One more day!";
-  else if (streak === 7) streakMessageEl.textContent = "🎉 ONE WEEK! You're amazing!";
-  else streakMessageEl.textContent = `🔥 ${streak} day streak! You're on fire!`;
 }
 
 
@@ -478,7 +352,6 @@ completeCircle.addEventListener("click", async (e) => {
     lastCompletedDate: today
   });
 
-  await updateGlobalStreak(uid);
  
   await loadHabits(uid);
 });
@@ -586,11 +459,7 @@ if (saveHabitBtn) {
         habitData
       );
 
-      
-      renderHabit(docRef.id, {
-        ...habitData,
-        id: docRef.id
-      }, user.uid);
+      await loadHabits(user.uid);
     }
 
     // Reset modal

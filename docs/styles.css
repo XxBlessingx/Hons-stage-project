@@ -1328,3 +1328,29 @@ h1 {
   font-size: 12px;
   font-weight: 600;
 }
+.health-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.health-thriving {
+  background: #d4edda;
+  color: #155724;
+}
+
+.health-stable {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.health-risk {
+  background: #ffe5b4;
+  color: #8a4b00;
+}
+
+.health-inactive {
+  background: #f8d7da;
+  color: #721c24;
+}
