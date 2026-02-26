@@ -1,7 +1,7 @@
 // Will be using this for the dashboard logic//
 //import {initializeApp} from
 // app.js — dashboard logic only
-
+import { ProgressTracker } from "./progress-tracker.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getAuth,
@@ -58,7 +58,7 @@ if (toggleAdvancedBtn) {
   });
 }
 
-// AUTH GUARD + ONBOARDING CHECK
+// AUTH GUARD + ONBOARDING CHECKs
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "login.html";
@@ -72,7 +72,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // User is authenticated + onboarded
+  // User is authenticated + has completed onboarding 
   const userData = userSnap.data();
   welcomeEl.textContent = `Welcome, ${userData.name}`;
 // this is what is used to load the users habits 
@@ -98,7 +98,21 @@ async function loadHabits(uid) {
   });
 
   // IMPORTANT — always calculate from all habits
-  updateProgressStats(allHabits);
+  //updateProgressStats(allHabits);
+
+ const tracker = new ProgressTracker(allHabits);
+ const streak = tracker.calculateStreak();
+
+  document.getElementById("current-streak").textContent = streak;
+  document.getElementById("streak-message").textContent = tracker.getStreakMessage(streak);
+
+  const dailyStats = tracker.calculateDailyProgress();
+
+  document.getElementById("completed-count").textContent = dailyStats.completed;
+  document.getElementById("total-count").textContent = dailyStats.total;
+  document.getElementById("goal-progress").style.width = `${dailyStats.percentage}%`; 
+
+  renderWeeklyCalendar(allHabits);
 
   const incomplete = allHabits.filter(habit =>
     !habit.completions || !habit.completions[today]
@@ -125,38 +139,38 @@ async function loadHabits(uid) {
   }
 }
 
-function updateProgressStats(habits) {
-  const today = new Date().toISOString().split("T")[0];
+// function updateProgressStats(habits) {
+//   const today = new Date().toISOString().split("T")[0];
 
-  const totalHabits = habits.length;
-  let completedToday = 0;
+//   const totalHabits = habits.length;
+//   let completedToday = 0;
 
-  habits.forEach(habit => {
-    if (habit.completions && habit.completions[today]) {
-      completedToday++;
-    }
-  });
+//   habits.forEach(habit => {
+//     if (habit.completions && habit.completions[today]) {
+//       completedToday++;
+//     }
+//   });
 
-  // Update numbers
-  document.getElementById("completed-count").textContent = completedToday;
-  document.getElementById("total-count").textContent = totalHabits;
+//   // Update numbers
+//   document.getElementById("completed-count").textContent = completedToday;
+//   document.getElementById("total-count").textContent = totalHabits;
 
-  // Update progress bar
-  const percentage = totalHabits === 0
-    ? 0
-    : Math.round((completedToday / totalHabits) * 100);
+//   // Update progress bar
+//   const percentage = totalHabits === 0
+//     ? 0
+//     : Math.round((completedToday / totalHabits) * 100);
 
-  document.getElementById("goal-progress").style.width = `${percentage}%`;
+//   document.getElementById("goal-progress").style.width = `${percentage}%`;
 
-  // 🔥 STREAK LOGIC
-  if (percentage === 100 && totalHabits > 0) {
-    increaseStreak();
-  }
-  renderWeeklyCalendar(habits);
-}
+//   // 🔥 STREAK LOGIC
+//   //if (percentage === 100 && totalHabits > 0) {
+//    // increaseStreak();
+//   }
+//   renderWeeklyCalendar(allHabits);
+// //}
 
 // streak building logic this is what is used to bulid the streak logic 
-function increaseStreak() {
+/*function increaseStreak() {
   const streakEl = document.getElementById("current-streak");
   let currentStreak = parseInt(localStorage.getItem("streak")) || 0;
 
@@ -170,10 +184,9 @@ function increaseStreak() {
   }
 
   streakEl.textContent = currentStreak;
-}
-
-document.getElementById("current-streak").textContent =
-localStorage.getItem("streak") || 0;
+}*/
+//document.getElementById("current-streak").textContent =
+//localStorage.getItem("streak") || 0;
 
 function renderWeeklyCalendar(habits) {
   const container = document.getElementById("week-days");
@@ -269,7 +282,7 @@ function renderHabit(id, habitData, uid) {
     };
     
     const categoryName = categoryNames[habitData.category] || "Other";
-    categoryBadge.textContent = categoryName; // Just the name, not the icon
+    categoryBadge.textContent = categoryName; 
     metaRow.appendChild(categoryBadge);
   }
 
@@ -327,32 +340,19 @@ completeCircle.addEventListener("click", async (e) => {
   const habit = habitSnap.data();
 
   const today = new Date().toISOString().split("T")[0];
-  const yesterdayDate = new Date();
-  yesterdayDate.setDate(yesterdayDate.getDate() - 1);
-  const yesterday = yesterdayDate.toISOString().split("T")[0];
 
-  let updatedStreak = habit.streak || 0;
-
-  if (habit.lastCompletedDate === today) {
-    return; // already completed today
-  }
-
-  if (habit.lastCompletedDate === yesterday) {
-    updatedStreak += 1;
-  } else {
-    updatedStreak = 1;
+  // Prevent double completion
+  if (habit.completions && habit.completions[today]) {
+    return;
   }
 
   await updateDoc(habitRef, {
     completions: {
       ...(habit.completions || {}),
       [today]: true
-    },
-    streak: updatedStreak,
-    lastCompletedDate: today
+    }
   });
 
- 
   await loadHabits(uid);
 });
 
@@ -390,7 +390,7 @@ completeCircle.addEventListener("click", async (e) => {
   delBtn.addEventListener("click", async () => {
     if (confirm("Are you sure you want to delete this habit?")) {
       await deleteDoc(doc(db, "users", uid, "habits", id));
-      //habitCard.remove();
+      
 
       if (habitList.children.length === 0) {
         emptyState.classList.remove("hidden");
@@ -422,7 +422,8 @@ if (saveHabitBtn) {
     if (!habitName) return;
 
     if (editingHabitId) {
-      // ✏️ UPDATE EXISTING HABIT
+
+      // UPDATE EXISTING HABIT
       await updateDoc(
         doc(db, "users", user.uid, "habits", editingHabitId),
         {
