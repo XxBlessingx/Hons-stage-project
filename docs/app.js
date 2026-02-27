@@ -58,6 +58,20 @@ if (toggleAdvancedBtn) {
   });
 }
 
+const frequencySelect = document.getElementById("habit-frequency");
+const customDaysContainer = document.getElementById("custom-days-container");
+
+if (frequencySelect && customDaysContainer) {
+  frequencySelect.addEventListener("change", () => {
+    if (frequencySelect.value === "custom") {
+      customDaysContainer.classList.remove("hidden");
+    } else {
+      customDaysContainer.classList.add("hidden");
+    }
+  });
+}
+
+
 // AUTH GUARD + ONBOARDING CHECKs
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
@@ -105,12 +119,25 @@ async function loadHabits(uid) {
 
   document.getElementById("current-streak").textContent = streak;
   document.getElementById("streak-message").textContent = tracker.getStreakMessage(streak);
-
+  
+  const insight = tracker.detectStreakRisk();
+  if (insight) {
+  showBehaviourMessage(insight.message);
+}
   const dailyStats = tracker.calculateDailyProgress();
 
   document.getElementById("completed-count").textContent = dailyStats.completed;
   document.getElementById("total-count").textContent = dailyStats.total;
   document.getElementById("goal-progress").style.width = `${dailyStats.percentage}%`; 
+
+  const insights = tracker.getBehaviouralInsights();
+  const aiInsightContainer  = document.getElementById("ai-insight");
+
+  if(insights.length > 0){
+    aiInsightContainer.textContent = insights[0].message;
+  }else{
+    aiInsightContainer.textContent = "You're building consistency. Keep going!";
+  }
 
   renderWeeklyCalendar(allHabits);
 

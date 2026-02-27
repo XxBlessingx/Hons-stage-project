@@ -4,29 +4,37 @@ export class ProgressTracker{
         this.today= new Date().toISOString().split('T')[0];
     }
     // this will be used to calclute the current streak held by the user
-    calculateStreak(){
-        let streak = 0;
-        let currentDate= new Date();
-         while(true){
-            const  dateStr = currentDate.toISOString().split('T')[0];
-            let allCompleted = true;
+    calculateStreak() {
+    // 🔒 Prevent infinite loop if no habits
+    if (!this.habits || this.habits.length === 0) {
+        return 0;
+    }
 
-            this.habits.forEach(habit => {
-                const completions = habit.completions || {};
-                if(!completions[dateStr]){
-                    allCompleted = false;
-                }
-            });
+    let streak = 0;
+    let currentDate = new Date();
 
-            if(allCompleted){
-                streak++;
-                currentDate.setDate(currentDate.getDate()-1);
-            }else{
+    while (true) {
+        const dateStr = currentDate.toISOString().split('T')[0];
+        let allCompleted = true;
+
+        for (let habit of this.habits) {
+            const completions = habit.completions || {};
+            if (!completions[dateStr]) {
+                allCompleted = false;
                 break;
             }
-         }
-         return streak;
+        }
+
+        if (allCompleted) {
+            streak++;
+            currentDate.setDate(currentDate.getDate() - 1);
+        } else {
+            break;
+        }
     }
+
+    return streak;
+}
     // calcutaing current days progress
     calculateDailyProgress(){
         const total = this.habits.length;
@@ -87,6 +95,96 @@ export class ProgressTracker{
     }
     
     return weekDays;
+  }
+  // detectStreakRisk()
+  // {
+  //   const streak = this.calculateStreak();
+  //   const daily = this.calculateDailyProgress();
+  //   //debugging
+  //   console.log("Streak:", streak);
+  //   console.log("Daily:", daily);
+  //   if (streak >= 3 && daily.completed < daily.total) {
+  //   return {
+  //     type: "warning",
+  //     title: "Streak at Risk",
+  //     message: "You're close to breaking your streak. Complete today's habits to keep it alive."
+      
+  //   };
+  // }
+  // return null;
+  // }
+
+//   detectStreakRisk() {
+//   const daily = this.calculateDailyProgress();
+
+//   // calculate streak ignoring today
+//   const originalToday = this.today;
+//   const yesterday = new Date();
+//   yesterday.setDate(yesterday.getDate() - 1);
+//   this.today = yesterday.toISOString().split('T')[0];
+
+//   const streakUntilYesterday = this.calculateStreak();
+
+//   this.today = originalToday;
+
+//   if (streakUntilYesterday >= 3 && daily.completed < daily.total) {
+//     return {
+//       type: "warning",
+//       title: "Streak at Risk",
+//       message: "You're close to breaking your streak."
+//     };
+//   }
+
+//   return null;
+// }
+// testing 
+detectStreakRisk() {
+  const daily = this.calculateDailyProgress();
+
+  // Clone habits so we don't mutate original
+  const habitsCopy = JSON.parse(JSON.stringify(this.habits));
+
+  let streak = 0;
+  let currentDate = new Date();
+  currentDate.setDate(currentDate.getDate() - 1); // START FROM YESTERDAY
+
+  while (true) {
+    const dateStr = currentDate.toISOString().split('T')[0];
+    let allCompleted = true;
+
+    for (let habit of habitsCopy) {
+      const completions = habit.completions || {};
+      if (!completions[dateStr]) {
+        allCompleted = false;
+        break;
+      }
+    }
+
+    if (allCompleted) {
+      streak++;
+      currentDate.setDate(currentDate.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+
+  if (streak >= 3 && daily.completed < daily.total) {
+    return {
+      type: "warning",
+      title: "Streak at Risk",
+      message: "You're close to breaking your streak. Complete today to protect it."
+    };
+  }
+
+  return null;
+}
+
+  getBehaviouralInsights(){
+    const insight = [];
+    const streakRisk = this.detectStreakRisk();
+    if(streakRisk) insight.push(streakRisk);
+
+    return insight;
   }
 
   // Generate streak message based on streak length

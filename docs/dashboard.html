@@ -46,9 +46,15 @@
                 <div class="calendar-header">THIS WEEK</div>
                 <div class="week-days" id="week-days"></div>
             </div>
-            
+            History
             <section class="habits">
                 <ul id="habit-list"></ul>
+                <div class="ai-insight-card">
+                    <h3>Ai insight engine</h3>
+                    <div id="ai-insight">
+                        You're building consistancy. Keep going!
+                    </div>
+                </div>
                 
                 <div id="empty-state" class="empty-state hidden">
                     <p> Why not try adding you first habit? </p>
@@ -78,8 +84,21 @@
                     <label>Frequency</label>
                     <select id="habit-frequency">
                     <option value="daily">Daily</option>
-                    <option value="weekly">Weekly</option>
+                    <option value="custom">Custom</option>
                 </select>
+                </div>
+                <!--allowing fr the user to choose set dates for thier habits-->
+                <div id="custom-days-container" class="hidden">
+                     <label>Select days:</label>
+                     <div class="day-selector">
+                        <label><input type="checkbox" class="day-checkbox" value="mon"> Mon</label>
+                        <label><input type="checkbox" class="day-checkbox" value="tue"> Tue</label>
+                        <label><input type="checkbox" class="day-checkbox" value="wed"> Wed</label>
+                        <label><input type="checkbox" class="day-checkbox" value="thu"> Thu</label>
+                        <label><input type="checkbox" class="day-checkbox" value="fri"> Fri</label>
+                        <label><input type="checkbox" class="day-checkbox" value="sat"> Sat</label>
+                        <label><input type="checkbox" class="day-checkbox" value="sun"> Sun</label>
+                    </div>
                 </div>
 
                 <!--Difficulty-->
