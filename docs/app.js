@@ -2,6 +2,7 @@
 //import {initializeApp} from
 // app.js — dashboard logic only
 import { ProgressTracker } from "./progress-tracker.js";
+import { BehaviourEngine } from "./behaviour-engine.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import {
   getAuth,
@@ -95,6 +96,50 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 // for displaying on the dashboard the not completed  habits 
+function shouldShowWeeklyCheckIn() {
+  
+  const today = new Date();
+  const day = today.getDay(); // 0 = Sunday
+
+  if (day !== 0) return false;
+
+  const lastShown = localStorage.getItem("lastCheckInShown");
+  const todayStr = today.toISOString().split("T")[0];
+
+  if (lastShown === todayStr) return false;
+
+  return true;
+}
+
+function showCheckInPopup(riskProfile) {
+  let message;
+  if (riskProfile.burnout) {
+  message = "It looks like you've disengaged recently. Start small and rebuild momentum.";
+  }
+  else if (riskProfile.overload) {
+    message = "You may be tracking too many habits. Consider reducing one this week.";
+  } 
+  else if (riskProfile.lowConsistency) {
+    message = "Your consistency dropped this week. Focus on completing just one habit daily.";
+  } 
+  else if (riskProfile.difficultyMismatch) {
+    message = "Some habits may be too difficult right now. Try simplifying one.";
+  } 
+  else {
+    message = "Great job this week. You're building steady consistency.";
+  }
+
+  const modal = document.getElementById("checkin-modal");
+  const messageEl = document.getElementById("checkin-message");
+
+  messageEl.textContent = message;
+  modal.classList.remove("hidden");
+
+  const todayStr = new Date().toISOString().split("T")[0];
+  localStorage.setItem("lastCheckInShown", todayStr);
+}
+
+  
 
 // for displaying habits 
 async function loadHabits(uid) {
@@ -110,6 +155,15 @@ async function loadHabits(uid) {
     const habitData = docSnap.data();
     allHabits.push({ id: docSnap.id, ...habitData });
   });
+
+const behaviour = new BehaviourEngine(allHabits);
+const riskProfile = behaviour.generateRiskProfile();
+
+if (shouldShowWeeklyCheckIn()) {
+  showCheckInPopup(riskProfile);
+}
+
+console.log("Risk Profile:", riskProfile);
 
   // IMPORTANT — always calculate from all habits
   //updateProgressStats(allHabits);
@@ -497,6 +551,16 @@ if (saveHabitBtn) {
   });
 }
 
+document.addEventListener("DOMContentLoaded", () => {
+  const closeBtn = document.getElementById("close-checkin");
+  const modal = document.getElementById("checkin-modal");
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => {
+      modal.classList.add("hidden");
+    });
+  }
+});
 
 const cancelBtn = document.getElementById("cancel-habit");
 // OPEN MODAL

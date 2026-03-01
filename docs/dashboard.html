@@ -41,12 +41,13 @@
                 <div class="streak-message" id="streak-message"> 🔥 you're on fire!
                 </div>
             </div>
+            
             <!--weekly calender-->
             <div class="weekly-calendar">
                 <div class="calendar-header">THIS WEEK</div>
                 <div class="week-days" id="week-days"></div>
             </div>
-            History
+            <!-- History-->
             <section class="habits">
                 <ul id="habit-list"></ul>
                 <div class="ai-insight-card">
@@ -55,7 +56,7 @@
                         You're building consistancy. Keep going!
                     </div>
                 </div>
-                
+                 
                 <div id="empty-state" class="empty-state hidden">
                     <p> Why not try adding you first habit? </p>
                 </div>
@@ -178,6 +179,15 @@
     
             </div>
         </div>
+
+        <div id="checkin-modal" class="checkin-modal hidden">
+            <div class="checkin-content">
+                <h2>Weekly Check-In</h2>
+                <p id="checkin-message"></p>
+                <button id="close-checkin">Close</button>
+            </div>
+        </div>
+        
         <script type="module" src="app.js"></script>
 
     </body>
