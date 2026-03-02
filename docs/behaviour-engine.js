@@ -38,68 +38,96 @@ export class BehaviourEngine {
     return totalCompleted / totalExpected;
   }
 
-  detectOverload() {
-    const dailyHabits = this.habits.filter(h => h.frequency === "daily");
-    const completionRate = this.calculateWeeklyCompletionRate();
+  detectBurnout() {
+    const last3 = this.getLastNDates(3);
+    let missedDays = 0;
 
-    return dailyHabits.length > 5 && completionRate < 0.5;
+    last3.forEach(date => {
+      const anyCompleted = this.habits.some(habit =>
+        habit.completions && habit.completions[date]
+      );
+
+      if (!anyCompleted) {
+        missedDays++;
+      }
+    });
+
+    return missedDays === 3;
   }
 
-  detectDifficultyMismatch() {
-    const hardHabits = this.habits.filter(
-      h => h.difficulty?.toLowerCase() === "hard"
+  getHabitPerformance() {
+    const last7 = this.getLastNDates(7);
+
+    return this.habits.map(habit => {
+      let completed = 0;
+
+      last7.forEach(date => {
+        if (habit.completions && habit.completions[date]) {
+          completed++;
+        }
+      });
+
+      return {
+        id: habit.id,
+        name: habit.name,
+        frequency: habit.frequency,
+        completionRate: completed / 7
+      };
+    });
+  }
+
+  getLowestPerformingHabit() {
+    const performances = this.getHabitPerformance();
+    if (performances.length === 0) return null;
+
+    return performances.reduce((lowest, current) =>
+      current.completionRate < lowest.completionRate ? current : lowest
     );
-
-    const hardRatio = hardHabits.length / this.habits.length;
-    const completionRate = this.calculateWeeklyCompletionRate();
-
-    return hardRatio > 0.6 && completionRate < 0.6;
   }
 
- generateRiskProfile() {
+  getLowestDailyHabit() {
+  const performances = this.getHabitPerformance()
+    .filter(h => h.frequency === "daily");
+
+  if (performances.length === 0) return null;
+
+  return performances.reduce((lowest, current) =>
+    current.completionRate < lowest.completionRate ? current : lowest
+  );
+}
+
+  generateRiskProfile() {
   const weeklyRate = this.calculateWeeklyCompletionRate();
 
-  const dailyHabits = this.habits.filter(h => h.frequency === "daily");
+  const todayStr = new Date().toISOString().split("T")[0];
+
+  const dailyHabits = this.habits.filter(h => 
+    h.frequency === "daily" &&
+    (!h.pausedUntil || h.pausedUntil < todayStr)
+  );
+
   const hardHabits = this.habits.filter(
     h => h.difficulty?.toLowerCase() === "hard"
   );
 
-  const hardRatio = this.habits.length === 0 
-    ? 0 
+  const hardRatio = this.habits.length === 0
+    ? 0
     : hardHabits.length / this.habits.length;
 
-  const overload = dailyHabits.length > 5 && weeklyRate < 0.5;
-  const difficultyMismatch = hardRatio > 0.6 && weeklyRate < 0.6;
-  const burnout = this.detectBurnout();
+     // for checking - debugging line
+  //console.log("Daily habit count:", dailyHabits.length);
 
   return {
     weeklyRate,
-    overload,
-    difficultyMismatch,
-    burnout,
-    lowConsistency: weeklyRate < 0.4
+    // uncomment me after testing 
+     overload: dailyHabits.length > 5 && weeklyRate < 0.5,
+    // overload: dailyHabits.length > 1,// comment me when not testing
+    difficultyMismatch: hardRatio > 0.6 && weeklyRate < 0.6,
+    burnout: this.detectBurnout(),
+    lowConsistency: weeklyRate < 0.4,
+    lowestHabit: this.getLowestDailyHabit()
   };
 
-  
-}
-detectBurnout() {
-  const last3 = this.getLastNDates(3);
-  let missedDays = 0;
-
-  last3.forEach(date => {
-    const anyCompleted = this.habits.some(habit =>
-      habit.completions && habit.completions[date]
-    );
-
-    if (!anyCompleted) {
-      missedDays++;
-    }
-  });
-// testing 
-console.log("Checking burnout for dates:", last3);
-  return missedDays === 3;
-
-  // testing
-  
+ 
 }
 }

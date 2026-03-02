@@ -35,6 +35,27 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+document.getElementById("pause-habit-btn")?.addEventListener("click", async (e) => {
+  const habitId = e.target.dataset.habitId;
+  if (!habitId) return;
+
+  const today = new Date();
+  today.setDate(today.getDate() + 7);
+  const pauseUntil = today.toISOString().split("T")[0];
+
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const habitRef = doc(db, "users", user.uid, "habits", habitId);
+
+  await updateDoc(habitRef, {
+    pausedUntil: pauseUntil
+  });
+
+  location.reload();
+});
+
+
 // Elements
 const welcomeEl = document.getElementById("welcome");
 const logoutBtn = document.getElementById("logout");
@@ -97,7 +118,7 @@ onAuthStateChanged(auth, async (user) => {
 
 // for displaying on the dashboard the not completed  habits 
 function shouldShowWeeklyCheckIn() {
-  
+  // after testing upcomment me PLEASE
   const today = new Date();
   const day = today.getDay(); // 0 = Sunday
 
@@ -116,8 +137,8 @@ function showCheckInPopup(riskProfile) {
   if (riskProfile.burnout) {
   message = "It looks like you've disengaged recently. Start small and rebuild momentum.";
   }
-  else if (riskProfile.overload) {
-    message = "You may be tracking too many habits. Consider reducing one this week.";
+  else if (riskProfile.overload && riskProfile.lowestHabit) {
+  message = `You're overloaded. Consider pausing: ${riskProfile.lowestHabit.name}.`;
   } 
   else if (riskProfile.lowConsistency) {
     message = "Your consistency dropped this week. Focus on completing just one habit daily.";
@@ -137,6 +158,15 @@ function showCheckInPopup(riskProfile) {
 
   const todayStr = new Date().toISOString().split("T")[0];
   localStorage.setItem("lastCheckInShown", todayStr);
+
+  const pauseBtn = document.getElementById("pause-habit-btn");
+
+  if (riskProfile.overload && riskProfile.lowestHabit) {
+    pauseBtn.classList.remove("hidden");
+    pauseBtn.dataset.habitId = riskProfile.lowestHabit.id;
+  } else {
+    pauseBtn.classList.add("hidden");
+  }
 }
 
   
@@ -162,8 +192,8 @@ const riskProfile = behaviour.generateRiskProfile();
 if (shouldShowWeeklyCheckIn()) {
   showCheckInPopup(riskProfile);
 }
-
-console.log("Risk Profile:", riskProfile);
+//just checking - for debugging purposes
+//console.log("Risk Profile:", riskProfile);
 
   // IMPORTANT — always calculate from all habits
   //updateProgressStats(allHabits);
@@ -210,6 +240,8 @@ console.log("Risk Profile:", riskProfile);
       <p>🎉 All habits completed for today!</p>
       <p><a href="all-habits.html">View all habits</a></p>
     `;
+    //figure out why this isnt  popping up when new users or first-time users set up an account
+    // CURRENTLY ISNT WORKING AS OF 2/March/26
   } else if (allHabits.length === 0) {
     emptyState.classList.remove("hidden");
     emptyState.innerHTML = `
