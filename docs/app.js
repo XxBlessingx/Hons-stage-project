@@ -118,7 +118,7 @@ onAuthStateChanged(auth, async (user) => {
 
 // for displaying on the dashboard the not completed  habits 
 function shouldShowWeeklyCheckIn() {
-  // after testing upcomment me PLEASE
+  //after testing upcomment me PLEASE
   const today = new Date();
   const day = today.getDay(); // 0 = Sunday
 
@@ -133,6 +133,10 @@ function shouldShowWeeklyCheckIn() {
 }
 
 function showCheckInPopup(riskProfile) {
+  const previousOverload = localStorage.getItem("previousOverload") === "true";
+  if (previousOverload && !riskProfile.overload) {
+  message = "Nice adjustment. Your workload is now balanced.";
+}
   let message;
   if (riskProfile.burnout) {
   message = "It looks like you've disengaged recently. Start small and rebuild momentum.";
@@ -155,6 +159,8 @@ function showCheckInPopup(riskProfile) {
 
   messageEl.textContent = message;
   modal.classList.remove("hidden");
+
+  localStorage.setItem("previousOverload", riskProfile.overload);
 
   const todayStr = new Date().toISOString().split("T")[0];
   localStorage.setItem("lastCheckInShown", todayStr);
@@ -348,9 +354,15 @@ function renderWeeklyCalendar(habits) {
 
 
 function renderHabit(id, habitData, uid) {
+const today = new Date().toISOString().split("T")[0];
+const isPaused = habitData.pausedUntil && habitData.pausedUntil >= today;
+
   const habitCard = document.createElement("div");
   habitCard.classList.add("habit-card");
-
+  if (isPaused) 
+    {
+      habitCard.classList.add("paused");
+    }
   // ===== LEFT SECTION =====
   const leftSection = document.createElement("div");
   leftSection.classList.add("habit-left");
@@ -425,6 +437,12 @@ function renderHabit(id, habitData, uid) {
     frequencyBadge.textContent = `⏰ ${frequencyText}`;
     metaRow.appendChild(frequencyBadge);
   }
+    if (isPaused) {
+    const pausedBadge = document.createElement("span");
+    pausedBadge.classList.add("paused-badge");
+    pausedBadge.textContent = `⏸ Paused until ${habitData.pausedUntil}`;
+    metaRow.appendChild(pausedBadge);
+  }
 
   leftSection.appendChild(metaRow);
 
@@ -436,8 +454,11 @@ function renderHabit(id, habitData, uid) {
   const completeCircle = document.createElement("div");
   completeCircle.classList.add("complete-circle");
 
-  const today = new Date().toISOString().split("T")[0];
+  //const today = new Date().toISOString().split("T")[0];
   const completions = habitData.completions || {};
+  //const isPaused = habitData.pausedUntil && habitData.pausedUntil >= today;
+
+
 
   // Check if already completed today
   if (completions[today]) {
@@ -446,13 +467,15 @@ function renderHabit(id, habitData, uid) {
 
   // ===== COMPLETION CLICK HANDLER =====
 completeCircle.addEventListener("click", async (e) => {
+  if (isPaused) return;
   e.stopPropagation();
 
   const habitRef = doc(db, "users", uid, "habits", id);
   const habitSnap = await getDoc(habitRef);
   const habit = habitSnap.data();
 
-  const today = new Date().toISOString().split("T")[0];
+  // const today = new Date().toISOString().split("T")[0];
+  // const compeletions =
 
   // Prevent double completion
   if (habit.completions && habit.completions[today]) {
