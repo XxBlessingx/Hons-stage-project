@@ -38,6 +38,58 @@ export class BehaviourEngine {
     return totalCompleted / totalExpected;
   }
 
+  getPreviousWeekCompletionRate() {
+  const dates = [];
+  for (let i = 7; i < 14; i++) {
+    const d = new Date();
+    d.setDate(this.today.getDate() - i);
+    dates.push(d.toISOString().split("T")[0]);
+  }
+
+  let totalExpected = 0;
+  let totalCompleted = 0;
+
+  this.habits.forEach(habit => {
+    if (habit.frequency === "daily") {
+      totalExpected += 7;
+    }
+
+    dates.forEach(date => {
+      if (habit.completions && habit.completions[date]) {
+        totalCompleted++;
+      }
+    });
+  });
+
+  if (totalExpected === 0) return 0;
+
+  return totalCompleted / totalExpected;
+}
+
+generateReinforcementProfile() {
+  const currentRate = this.calculateWeeklyCompletionRate();
+  const previousRate = this.getPreviousWeekCompletionRate();
+
+  let momentum = false;
+  let strongConsistency = false;
+
+  if (currentRate > previousRate + 0.1) {
+    momentum = true;
+  }
+
+  if (currentRate >= 0.7) {
+    strongConsistency = true;
+  }
+
+  return {
+    momentum,
+    strongConsistency,
+    currentRate,
+    previousRate
+  };
+}
+  
+
   detectBurnout() {
     const last3 = this.getLastNDates(3);
     let missedDays = 0;
@@ -116,6 +168,27 @@ export class BehaviourEngine {
 
      // for checking - debugging line
   //console.log("Daily habit count:", dailyHabits.length);
+  let riskScore = 0;
+
+// Burnout is serious
+if (this.detectBurnout()) riskScore += 40;
+
+// Overload is structural strain
+if (dailyHabits.length > 5 && weeklyRate < 0.5) riskScore += 25;
+
+// Low consistency
+if (weeklyRate < 0.4) riskScore += 20;
+
+// Difficulty mismatch
+if (hardRatio > 0.6 && weeklyRate < 0.6) riskScore += 15;
+
+// Cap score at 100
+riskScore = Math.min(riskScore, 100);
+
+let riskLevel = "Low";
+
+if (riskScore >= 60) riskLevel = "High";
+else if (riskScore >= 30) riskLevel = "Moderate";
 
   return {
     weeklyRate,
@@ -125,7 +198,9 @@ export class BehaviourEngine {
     difficultyMismatch: hardRatio > 0.6 && weeklyRate < 0.6,
     burnout: this.detectBurnout(),
     lowConsistency: weeklyRate < 0.4,
-    lowestHabit: this.getLowestDailyHabit()
+    lowestHabit: this.getLowestDailyHabit(),
+    riskScore,
+    riskLevel
   };
 
  

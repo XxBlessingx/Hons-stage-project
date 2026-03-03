@@ -1389,3 +1389,13 @@ h1 {
   padding: 3px 6px;
   border-radius: 6px;
 }
+
+.ai-insight-card.momentum {
+  border-left: 4px solid #4CAF50;
+  background: rgba(76, 175, 80, 0.05);
+}
+
+.ai-insight-card.strong {
+  border-left: 4px solid #FFD700;
+  background: rgba(255, 215, 0, 0.08);
+}

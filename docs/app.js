@@ -1,6 +1,7 @@
 // Will be using this for the dashboard logic//
 //import {initializeApp} from
 // app.js — dashboard logic only
+// still need to 
 import { ProgressTracker } from "./progress-tracker.js";
 import { BehaviourEngine } from "./behaviour-engine.js";
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -194,12 +195,13 @@ async function loadHabits(uid) {
 
 const behaviour = new BehaviourEngine(allHabits);
 const riskProfile = behaviour.generateRiskProfile();
+const reinforcement = behaviour.generateReinforcementProfile();
 
 if (shouldShowWeeklyCheckIn()) {
   showCheckInPopup(riskProfile);
 }
 //just checking - for debugging purposes
-//console.log("Risk Profile:", riskProfile);
+console.log("Risk Profile:", riskProfile);
 
   // IMPORTANT — always calculate from all habits
   //updateProgressStats(allHabits);
@@ -220,15 +222,29 @@ if (shouldShowWeeklyCheckIn()) {
   document.getElementById("total-count").textContent = dailyStats.total;
   document.getElementById("goal-progress").style.width = `${dailyStats.percentage}%`; 
 
-  const insights = tracker.getBehaviouralInsights();
-  const aiInsightContainer  = document.getElementById("ai-insight");
+const aiInsightContainer = document.getElementById("ai-insight");
+const aiCard = document.querySelector(".ai-insight-card");
 
-  if(insights.length > 0){
-    aiInsightContainer.textContent = insights[0].message;
-  }else{
-    aiInsightContainer.textContent = "You're building consistency. Keep going!";
-  }
+aiCard.classList.remove("momentum", "strong");
 
+if (reinforcement.strongConsistency) {
+  aiInsightContainer.textContent =
+    "🏆 Outstanding consistency this week. You're building real discipline.";
+  aiCard.classList.add("strong");
+}
+else if (reinforcement.momentum) {
+  aiInsightContainer.textContent =
+    "📈 You're improving compared to last week. Keep building that momentum.";
+  aiCard.classList.add("momentum");
+}
+else if (riskProfile.lowConsistency) {
+  aiInsightContainer.textContent =
+    "⚠️ Try focusing on completing just one habit per day.";
+}
+else {
+  aiInsightContainer.textContent =
+    "You're building consistency. Keep going!";
+}
   renderWeeklyCalendar(allHabits);
 
   const incomplete = allHabits.filter(habit =>
