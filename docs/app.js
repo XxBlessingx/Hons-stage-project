@@ -194,8 +194,12 @@ async function loadHabits(uid) {
   });
 
 const behaviour = new BehaviourEngine(allHabits);
+// testing - debugging purposes
+console.log("Highest Habit:", behaviour.getHighestPerformingHabit());
+
 const riskProfile = behaviour.generateRiskProfile();
 const reinforcement = behaviour.generateReinforcementProfile();
+const achievements = behaviour.generateAchievementProfile();
 
 if (shouldShowWeeklyCheckIn()) {
   showCheckInPopup(riskProfile);
@@ -227,7 +231,11 @@ const aiCard = document.querySelector(".ai-insight-card");
 
 aiCard.classList.remove("momentum", "strong");
 
-if (reinforcement.strongConsistency) {
+if (achievements.length > 0) {
+  aiInsightContainer.textContent = achievements[0].message;
+  aiCard.classList.add("strong");
+}
+else if (reinforcement.strongConsistency) {
   aiInsightContainer.textContent =
     "🏆 Outstanding consistency this week. You're building real discipline.";
   aiCard.classList.add("strong");
@@ -601,9 +609,7 @@ if (saveHabitBtn) {
         impact: document.getElementById("habit-impact").value || null,
         motivation: document.getElementById("habit-motivation").value || null,
         category: document.getElementById("habit-category").value,
-        completions: {}, // Initialize empty completions object
-        streak:0,
-        lastCompletedDate: null,
+        completions: {},
         createdAt: new Date()
       };
       

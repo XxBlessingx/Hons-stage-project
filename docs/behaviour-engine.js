@@ -38,6 +38,23 @@ export class BehaviourEngine {
     return totalCompleted / totalExpected;
   }
 
+  calculateHabitStreak(habit) {
+  let streak = 0;
+  let date = new Date();
+
+  while (true) {
+    const dateStr = date.toISOString().split("T")[0];
+
+    if (habit.completions && habit.completions[dateStr]) {
+      streak++;
+      date.setDate(date.getDate() - 1);
+    } else {
+      break;
+    }
+  }
+
+  return streak;
+}
   getPreviousWeekCompletionRate() {
   const dates = [];
   for (let i = 7; i < 14; i++) {
@@ -88,6 +105,79 @@ generateReinforcementProfile() {
     previousRate
   };
 }
+
+generateAchievementProfile() {
+  const weeklyRate = this.calculateWeeklyCompletionRate();
+  const achievements = [];
+
+  // Weekly performance milestone
+  if (weeklyRate >= 0.7) {
+    achievements.push({
+      type: "consistency",
+      message: "🏆 70%+ weekly completion. Strong discipline."
+    });
+  }
+
+  if (weeklyRate === 1) {
+    achievements.push({
+      type: "perfectWeek",
+      message: "🔥 Perfect week. Elite focus."
+    });
+  }
+
+  
+  this.habits.forEach(habit => {
+    const streak = this.calculateHabitStreak(habit);
+
+    if (streak === 3) {
+      achievements.push({
+        type: "streak3",
+        message: `🌱 ${habit.name}: 3-day streak started.`
+      });
+    }
+
+    if (streak === 7) {
+      achievements.push({
+        type: "streak7",
+        message: `🚀 ${habit.name}: 7-day streak. Momentum building.`
+      });
+    }
+  });
+
+  return achievements;
+}
+
+getHighestPerformingHabit() {
+  const performances = this.getHabitPerformance();
+
+  if (performances.length === 0) return null;
+
+  const frequencyWeight = {
+    daily: 1.2,
+    weekly: 1.0,
+    custom: 0.9
+  };
+
+  const difficultyWeight = {
+    hard: 1.3,
+    medium: 1.1,
+    easy: 1.0
+  };
+
+  return performances.reduce((highest, current) => {
+    const currentScore =
+      current.completionRate *
+      (frequencyWeight[current.frequency] || 1) *
+      (difficultyWeight[current.difficulty] || 1);
+
+    const highestScore =
+      highest.completionRate *
+      (frequencyWeight[highest.frequency] || 1) *
+      (difficultyWeight[highest.difficulty] || 1);
+
+    return currentScore > highestScore ? current : highest;
+  });
+}
   
 
   detectBurnout() {
@@ -106,27 +196,27 @@ generateReinforcementProfile() {
 
     return missedDays === 3;
   }
+getHabitPerformance() {
+  const last7 = this.getLastNDates(7);
 
-  getHabitPerformance() {
-    const last7 = this.getLastNDates(7);
+  return this.habits.map(habit => {
+    let completed = 0;
 
-    return this.habits.map(habit => {
-      let completed = 0;
-
-      last7.forEach(date => {
-        if (habit.completions && habit.completions[date]) {
-          completed++;
-        }
-      });
-
-      return {
-        id: habit.id,
-        name: habit.name,
-        frequency: habit.frequency,
-        completionRate: completed / 7
-      };
+    last7.forEach(date => {
+      if (habit.completions && habit.completions[date]) {
+        completed++;
+      }
     });
-  }
+
+    return {
+      id: habit.id,
+      name: habit.name,
+      frequency: habit.frequency,
+      difficulty: habit.difficulty,
+      completionRate: completed / 7
+    };
+  });
+}
 
   getLowestPerformingHabit() {
     const performances = this.getHabitPerformance();
