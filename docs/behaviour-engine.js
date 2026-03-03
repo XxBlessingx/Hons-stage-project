@@ -15,36 +15,55 @@ export class BehaviourEngine {
   }
 
   calculateWeeklyCompletionRate() {
-    const last7 = this.getLastNDates(7);
-    let totalExpected = 0;
-    let totalCompleted = 0;
+  const last7 = this.getLastNDates(7);
+  let totalExpected = 0;
+  let totalCompleted = 0;
 
-    this.habits.forEach(habit => {
-      if (habit.frequency === "daily") {
-        totalExpected += 7;
-      } else if (habit.frequency === "weekly") {
-        totalExpected += 1;
-      }
+  const todayStr = new Date().toISOString().split("T")[0];
+
+  this.habits.forEach(habit => {
+    const isPaused =
+      habit.pausedUntil && habit.pausedUntil >= todayStr;
+
+    if (isPaused) return; // Skip paused habits completely
+
+    // DAILY HABITS
+    if (habit.frequency === "daily") {
+      totalExpected += 7;
 
       last7.forEach(date => {
         if (habit.completions && habit.completions[date]) {
           totalCompleted++;
         }
       });
-    });
+    }
 
-    if (totalExpected === 0) return 0;
+    // WEEKLY HABITS
+    else if (habit.frequency === "weekly") {
+      totalExpected += 1;
 
-    return totalCompleted / totalExpected;
-  }
+      const completedThisWeek = last7.some(date =>
+        habit.completions && habit.completions[date]
+      );
 
-  calculateHabitStreak(habit) {
+      if (completedThisWeek) {
+        totalCompleted += 1;
+      }
+    }
+  });
+
+  if (totalExpected === 0) return 0;
+
+  return totalCompleted / totalExpected;
+}
+
+ calculateHabitStreak(habit) {
   let streak = 0;
   let date = new Date();
+  date.setDate(date.getDate() - 1); // start from yesterday
 
   while (true) {
     const dateStr = date.toISOString().split("T")[0];
-
     if (habit.completions && habit.completions[dateStr]) {
       streak++;
       date.setDate(date.getDate() - 1);
@@ -107,7 +126,9 @@ generateReinforcementProfile() {
 }
 
 generateAchievementProfile() {
-  const weeklyRate = this.calculateWeeklyCompletionRate();
+  const weeklyRate = this.calculateWeeklyCompletionRate(); 
+  
+
   const achievements = [];
 
   // Weekly performance milestone
@@ -118,7 +139,7 @@ generateAchievementProfile() {
     });
   }
 
-  if (weeklyRate === 1) {
+  if (weeklyRate >= 0.99) {
     achievements.push({
       type: "perfectWeek",
       message: "🔥 Perfect week. Elite focus."
@@ -142,7 +163,7 @@ generateAchievementProfile() {
         message: `🚀 ${habit.name}: 7-day streak. Momentum building.`
       });
     }
-  });
+  }); 
 
   return achievements;
 }
@@ -256,8 +277,7 @@ getHabitPerformance() {
     ? 0
     : hardHabits.length / this.habits.length;
 
-     // for checking - debugging line
-  //console.log("Daily habit count:", dailyHabits.length);
+  
   let riskScore = 0;
 
 // Burnout is serious
@@ -282,13 +302,13 @@ else if (riskScore >= 30) riskLevel = "Moderate";
 
   return {
     weeklyRate,
-    // uncomment me after testing 
-     overload: dailyHabits.length > 5 && weeklyRate < 0.5,
-    // overload: dailyHabits.length > 1,// comment me when not testing
+     
+    overload: dailyHabits.length > 5 && weeklyRate < 0.5,
     difficultyMismatch: hardRatio > 0.6 && weeklyRate < 0.6,
     burnout: this.detectBurnout(),
     lowConsistency: weeklyRate < 0.4,
     lowestHabit: this.getLowestDailyHabit(),
+    highestHabit: this.getHighestPerformingHabit(),
     riskScore,
     riskLevel
   };
