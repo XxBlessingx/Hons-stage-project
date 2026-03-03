@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"  name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HabitIQ | Settings</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="settings.css" />
+</head>
+<body>
+
+  <nav>
+    <a href="dashboard.html" class="nav-logo">🔥 HabitIQ</a>
+    <div class="nav-links">
+      <a href="dashboard.html">Dashboard</a>
+      <a href="all-habits.html">All Habits</a>
+      <a href="profile.html">Profile</a>
+      <a href="settings.html" class="active">Settings</a>
+      <button id="logout">Log out</button>
+    </div>
+  </nav>
+
+  <main class="settings-main">
+
+    <div class="page-header">
+      <h1>Settings</h1>
+      <p>Manage your preferences, data, and account.</p>
+    </div>
+
+    <section class="settings-section">
+      <h2>Account</h2>
+
+      <label class="toggle-row">
+        <div class="toggle-info">
+          <span class="toggle-label">Enable AI-generated insights</span>
+          <span class="toggle-desc">Allow HabitIQ to analyse your habits and generate personalised advice.</span>
+          <span class="consent-status" id="consent-status">AI insights disabled</span>
+        </div>
+        <input type="checkbox" id="ai-consent-toggle">
+      </label>
+
+      <button id="download-data" class="settings-btn">⬇ Download My Data</button>
+      <button id="delete-account" class="settings-btn danger">Delete Account</button>
+    </section>
+
+    <section class="settings-section">
+      <h2>Accessibility</h2>
+
+      <label class="toggle-row">
+        <div class="toggle-info">
+          <span class="toggle-label">Dyslexia-friendly font</span>
+          <span class="toggle-desc">Increases font size, spacing, and switches to a more readable typeface.</span>
+        </div>
+        <input type="checkbox" id="font-toggle">
+      </label>
+
+      <label class="toggle-row">
+        <div class="toggle-info">
+          <span class="toggle-label">High contrast mode</span>
+          <span class="toggle-desc">Increases visual contrast across the app for improved readability.</span>
+        </div>
+        <input type="checkbox" id="contrast-toggle">
+      </label>
+    </section>
+
+    <p class="save-indicator hidden" id="save-indicator">✓ Settings saved</p>
+
+  </main>
+
+  <!-- Delete confirmation modal -->
+  <div class="modal hidden" id="delete-modal">
+    <div class="modal-content">
+      <h3>Delete your account?</h3>
+      <p>This will permanently delete your account, all your habits, and your completion history. This cannot be undone.</p>
+      <div class="modal-actions">
+        <button id="cancel-delete">Cancel</button>
+        <button id="confirm-delete" class="danger">Yes, delete everything</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="settings.js"></script>
+
+</body>
+</html>
