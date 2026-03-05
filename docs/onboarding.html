@@ -51,8 +51,6 @@
 
 
         <!--QUESTION 4-->
-
-
         <section class="step" data-key="supportStyle">
             <h2>How would you like Habit to support you.</h2>
             <div class="options">
@@ -61,9 +59,113 @@
                 <button type="button" data-value="mix">A mix I'll figure it out as I go</button>
             </div>
 
-            <button id="finish" disabled>Continue</button>
-
+            <button class="next" disabled>Next</button>
         </section>
+
+        <!-- Question 5 and starter habit -->
+
+        <section class="step" data-key="starterHabits">
+            <h2>Choose Your Starting Habits</h2>
+            <p class="step-subtitle">Select habits to begin your journey. You can customise or add more later!</p>
+
+    <div class="habit-picker-grid">
+
+        <div class="habit-picker-card" data-habit="Morning Meditation" data-category="🧘" data-difficulty="easy">
+        <div class="habit-picker-icon">🧘</div>
+        <div class="habit-picker-info">
+            <strong>Morning Meditation</strong>
+            <p>Start your day with 10 minutes of mindfulness</p>
+            <div class="habit-picker-tags">
+            <span>mindfulness</span><span>easy</span>
+            </div>
+        </div>
+        </div>
+
+        <div class="habit-picker-card" data-habit="Drink Water" data-category="💧" data-difficulty="easy">
+        <div class="habit-picker-icon">💧</div>
+        <div class="habit-picker-info">
+            <strong>Drink Water</strong>
+            <p>Stay hydrated with 8 glasses throughout the day</p>
+            <div class="habit-picker-tags">
+            <span>health</span><span>easy</span>
+            </div>
+        </div>
+        </div>
+
+        <div class="habit-picker-card" data-habit="Exercise" data-category="💪" data-difficulty="medium">
+        <div class="habit-picker-icon">💪</div>
+        <div class="habit-picker-info">
+            <strong>Exercise</strong>
+            <p>30 minutes of physical activity</p>
+            <div class="habit-picker-tags">
+            <span>fitness</span><span>medium</span>
+            </div>
+        </div>
+        </div>
+
+        <div class="habit-picker-card" data-habit="Read" data-category="📖" data-difficulty="easy">
+        <div class="habit-picker-icon">📖</div>
+        <div class="habit-picker-info">
+            <strong>Read</strong>
+            <p>Read for 20 minutes before bed</p>
+            <div class="habit-picker-tags">
+            <span>learning</span><span>easy</span>
+            </div>
+        </div>
+        </div>
+
+        <div class="habit-picker-card" data-habit="Healthy Meal" data-category="🥗" data-difficulty="medium">
+        <div class="habit-picker-icon">🥗</div>
+        <div class="habit-picker-info">
+            <strong>Healthy Meal</strong>
+            <p>Eat one nutritious, home-cooked meal</p>
+            <div class="habit-picker-tags">
+            <span>health</span><span>medium</span>
+            </div>
+        </div>
+        </div>
+
+        <div class="habit-picker-card" data-habit="Journal" data-category="✍️" data-difficulty="easy">
+        <div class="habit-picker-icon">✍️</div>
+        <div class="habit-picker-info">
+            <strong>Journal</strong>
+            <p>Reflect on your day with writing</p>
+            <div class="habit-picker-tags">
+            <span>mindfulness</span><span>easy</span>
+            </div>
+        </div>
+        </div>
+
+        <div class="habit-picker-card" data-habit="Study Session" data-category="📚" data-difficulty="medium">
+        <div class="habit-picker-icon">📚</div>
+        <div class="habit-picker-info">
+            <strong>Study Session</strong>
+            <p>Focused study for at least 45 minutes</p>
+            <div class="habit-picker-tags">
+            <span>studying</span><span>medium</span>
+            </div>
+        </div>
+        </div>
+
+        <div class="habit-picker-card" data-habit="Sleep by 11pm" data-category="💤" data-difficulty="medium">
+        <div class="habit-picker-icon">💤</div>
+        <div class="habit-picker-info">
+            <strong>Sleep by 11pm</strong>
+            <p>Maintain a consistent sleep schedule</p>
+            <div class="habit-picker-tags">
+            <span>sleep</span><span>medium</span>
+            </div>
+        </div>
+        </div>
+
+    </div>
+
+    <div class="habit-picker-actions">
+        <button id="skip-habits" class="btn-secondary">Skip for Now</button>
+        <button id="finish" disabled>Start with <span id="selected-count">0</span> Habits →</button>
+    </div>
+
+    </section>
 
         <script type="module" src="onboarding.js"></script>
     </body>

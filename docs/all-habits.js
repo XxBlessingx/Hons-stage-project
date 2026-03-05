@@ -79,25 +79,29 @@ async function loadAllHabits(uid) {
   habitsContainer.innerHTML = "";
   
   const habitsRef = collection(db, "users", uid, "habits");
-  const snapshot = await getDocs(habitsRef);
-  
-  if (snapshot.empty) {
-    emptyState.classList.remove("hidden");
-    return;
-  }
-  
-  emptyState.classList.add("hidden");
   allHabits = [];
-  
-  snapshot.forEach((docSnap) => {
-    const habitData = {
-      id: docSnap.id,
-      ...docSnap.data()
-    };
-    allHabits.push(habitData);
-    renderHabit(habitData, uid);
-  });
+
+  try {
+    const snapshot = await getDocs(habitsRef);
+
+    if (snapshot.empty) {
+      emptyState.classList.remove("hidden");
+      return;
+    }
+
+    emptyState.classList.add("hidden");
+
+    snapshot.forEach((docSnap) => {
+      const habitData = { id: docSnap.id, ...docSnap.data() };
+      allHabits.push(habitData);
+      renderHabit(habitData, uid);
+    });
+  } catch (err) {
+    console.error("Failed to load habits:", err);
+    habitsContainer.innerHTML = "<p>Failed to load habits. Please refresh.</p>";
+  }
 }
+
 
 // Render a single habit for All Habits page
 function renderHabit(habitData, uid) {
@@ -166,6 +170,14 @@ function renderHabit(habitData, uid) {
     frequencyBadge.classList.add("frequency-badge");
     frequencyBadge.textContent = `⏰ ${habitData.frequency}`;
     metaRow.appendChild(frequencyBadge);
+  }
+
+  // time option
+  if (habitData.time) {
+    const timeBadge = document.createElement("span");
+    timeBadge.classList.add("time-badge");
+    timeBadge.textContent = `🕐 ${habitData.time}`;
+    metaRow.appendChild(timeBadge);
   }
 
   leftSection.appendChild(metaRow);
@@ -245,11 +257,15 @@ categoryFilter.addEventListener('change', filterHabits);
 // Delete habit function
 async function deleteHabit(habitId, uid, cardElement) {
   if (confirm("Are you sure you want to delete this habit?")) {
-    await deleteDoc(doc(db, "users", uid, "habits", habitId));
-    cardElement.remove();
-    
-    if (habitsContainer.children.length === 0) {
-      emptyState.classList.remove("hidden");
+    try {
+      await deleteDoc(doc(db, "users", uid, "habits", habitId));
+      cardElement.remove();
+      if (habitsContainer.children.length === 0) {
+        emptyState.classList.remove("hidden");
+      }
+    } catch (err) {
+      console.error("Failed to delete habit:", err);
+      alert("Could not delete habit. Please try again.");
     }
   }
 }
@@ -263,6 +279,7 @@ function openEditModal(habitData) {
   document.getElementById("habit-category").value = habitData.category || "📚";
   document.getElementById("habit-impact").value = habitData.impact || "medium";
   document.getElementById("habit-motivation").value = habitData.motivation || "";
+  document.getElementById("habit-time").value = habitData.time || "";
 
   editingHabitId = habitData.id;
   modal.classList.remove("hidden");
@@ -283,31 +300,34 @@ if (saveHabitBtn) {
       direction: document.getElementById("habit-direction").value,
       category: document.getElementById("habit-category").value,
       impact: document.getElementById("habit-impact").value || null,
-      motivation: document.getElementById("habit-motivation").value || null
+      motivation: document.getElementById("habit-motivation").value || null,
+      time: document.getElementById("habit-time").value || null
     };
 
-    if (editingHabitId) {
-      // Update existing habit
-      await updateDoc(
-        doc(db, "users", currentUser.uid, "habits", editingHabitId),
-        habitData
-      );
-      editingHabitId = null;
-    } else {
-      // Create new habit
-      habitData.completions = {};
-      habitData.createdAt = new Date();
-      
-      await addDoc(
-        collection(db, "users", currentUser.uid, "habits"),
-        habitData
-      );
-    }
+    try {
+      if (editingHabitId) {
+        await updateDoc(
+          doc(db, "users", currentUser.uid, "habits", editingHabitId),
+          habitData
+        );
+        editingHabitId = null;
+      } else {
+        habitData.completions = {};
+        habitData.createdAt = new Date();
+        await addDoc(
+          collection(db, "users", currentUser.uid, "habits"),
+          habitData
+        );
+      }
 
-    // Reset and reload
-    modalHabitInput.value = "";
-    modal.classList.add("hidden");
-    loadAllHabits(currentUser.uid);
+      modalHabitInput.value = "";
+      modal.classList.add("hidden");
+      loadAllHabits(currentUser.uid);
+
+    } catch (err) {
+      console.error("Failed to save habit:", err);
+      alert("Could not save habit. Please try again.");
+    }
   });
 }
 
@@ -322,6 +342,8 @@ if (openModalBtn) {
     document.getElementById("habit-category").value = "📚";
     document.getElementById("habit-impact").value = "medium";
     document.getElementById("habit-motivation").value = "";
+    document.getElementById("habit-time").value = ""; 
+    
     modal.classList.remove("hidden");
   });
 }

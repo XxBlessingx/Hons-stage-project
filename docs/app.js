@@ -169,6 +169,7 @@ if (reinforcementProfile.strongConsistency || achievementProfile.length > 0) {
       <p>🎉 All habits completed for today!</p>
       <p><a href="all-habits.html">View all habits</a></p>
     `;
+    
   } else if (allHabits.length === 0) {
     emptyState.classList.remove("hidden");
     emptyState.innerHTML = `<p>Why not add your first habit?</p>`;
@@ -281,7 +282,14 @@ function renderHabit(id, habitData, uid) {
     metaRow.appendChild(frequencyBadge);
   }
 
-  // Paused badge
+  if (habitData.time) {
+  const timeBadge = document.createElement("span");
+  timeBadge.classList.add("time-badge");
+  timeBadge.textContent = `🕐 ${habitData.time}`;
+  metaRow.appendChild(timeBadge);
+}
+
+  // // Paused badge
   if (isPaused) {
     const pausedBadge = document.createElement("span");
     pausedBadge.classList.add("paused-badge");
@@ -341,6 +349,8 @@ function renderHabit(id, habitData, uid) {
     document.getElementById("habit-category").value = habitData.category || "📚";
     document.getElementById("habit-impact").value = habitData.impact || "low";
     document.getElementById("habit-motivation").value = habitData.motivation || "";
+    document.getElementById("habit-time").value = habitData.time || "";
+
     editingHabitId = id;
     modal.classList.remove("hidden");
     
@@ -364,7 +374,87 @@ function renderHabit(id, habitData, uid) {
     }
   });
 
+  const pauseBtn = document.createElement("button");
+  pauseBtn.textContent = "⏸";
+  pauseBtn.classList.add("icon-btn", "pause-btn");
+  pauseBtn.title = isPaused ? "Resume habit" : "Pause habit";
+  
+  pauseBtn.addEventListener("click", async (e) => {
+  e.stopPropagation();
+
+  // If already paused, resume it
+  if (isPaused) {
+    try {
+      await updateDoc(doc(db, "users", uid, "habits", id), {
+        pausedUntil: null
+      });
+      await loadHabits(uid, currentAiConsent);
+    } catch (err) {
+      console.error("Failed to resume habit:", err);
+      alert("Could not resume habit. Please try again.");
+    }
+    return;
+  }
+
+  // Remove any existing dropdown first
+  const existing = document.getElementById("pause-dropdown");
+  if (existing) existing.remove();
+
+  // Build dropdown
+  const dropdown = document.createElement("div");
+  dropdown.id = "pause-dropdown";
+  dropdown.classList.add("pause-dropdown");
+  dropdown.innerHTML = `
+    <p class="pause-dropdown-title">Pause for how long?</p>
+    <button class="pause-option" data-days="7">7 days</button>
+    <button class="pause-option" data-days="14">14 days</button>
+    <button class="pause-option" data-days="30">30 days</button>
+    <button class="pause-cancel">Cancel</button>
+  `;
+
+  // Position it near the button
+  pauseBtn.parentElement.appendChild(dropdown);
+
+  // Option click handler
+  dropdown.querySelectorAll(".pause-option").forEach(btn => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const days = parseInt(btn.dataset.days);
+      const pauseUntil = new Date();
+      pauseUntil.setDate(pauseUntil.getDate() + days);
+      const pauseUntilStr = pauseUntil.toISOString().split("T")[0];
+
+      dropdown.remove();
+
+      try {
+        await updateDoc(doc(db, "users", uid, "habits", id), {
+          pausedUntil: pauseUntilStr
+        });
+        await loadHabits(uid, currentAiConsent);
+      } catch (err) {
+        console.error("Failed to pause habit:", err);
+        alert("Could not pause habit. Please try again.");
+      }
+    });
+  });
+
+  // Cancel button
+  dropdown.querySelector(".pause-cancel").addEventListener("click", (e) => {
+    e.stopPropagation();
+    dropdown.remove();
+  });
+
+  // Close if user clicks outside
+  setTimeout(() => {
+    document.addEventListener("click", function handler() {
+      dropdown.remove();
+      document.removeEventListener("click", handler);
+    });
+  }, 0);
+});
+
   buttonContainer.appendChild(editBtn);
+  buttonContainer.appendChild(pauseBtn);
   buttonContainer.appendChild(delBtn);
 
   rightSection.appendChild(completeCircle);
@@ -398,6 +488,7 @@ if (saveHabitBtn) {
           category: document.getElementById("habit-category").value,
           direction: document.getElementById("habit-direction").value,
           motivation: document.getElementById("habit-motivation").value || null,
+          time: document.getElementById("habit-time").value || null
         }
       );
       editingHabitId = null;
@@ -411,6 +502,7 @@ if (saveHabitBtn) {
         impact: document.getElementById("habit-impact").value || null,
         motivation: document.getElementById("habit-motivation").value || null,
         category: document.getElementById("habit-category").value,
+        time: document.getElementById("habit-time").value || null,
         completions: {},
         createdAt: new Date()
       });

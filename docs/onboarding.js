@@ -4,7 +4,8 @@ import {
   getFirestore,
   doc,
   setDoc,
-  serverTimestamp
+  addDoc,
+  collection
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
  
 const firebaseConfig = {
@@ -35,12 +36,6 @@ function showStep(index) {
   steps.forEach(step => step.classList.remove("active"));
   steps[index].classList.add("active");
 }
- //const user = auth.currentUser;
-
-//if (!user) {
- // alert("Please sign in first");
-  //window.location.href = "login.html";
-//}
 
 // Run logic for each step
 steps.forEach((step, index) => {
@@ -69,7 +64,28 @@ steps.forEach((step, index) => {
   }
 });
 
+const pickerCards = document.querySelectorAll(".habit-picker-card");
+const selectedCountEl = document.getElementById("selected-count");
 const finishBtn = document.getElementById("finish");
+const skipBtn = document.getElementById("skip-habits");
+
+pickerCards.forEach(card => {
+  card.addEventListener("click", () => {
+    card.classList.toggle("selected");
+    const count = document.querySelectorAll(".habit-picker-card.selected").length;
+    selectedCountEl.textContent = count;
+    finishBtn.disabled = count === 0;
+  });
+});
+
+skipBtn.addEventListener("click", () => {
+  // Deselect all and finish with no habits
+  pickerCards.forEach(card => card.classList.remove("selected"));
+  selectedCountEl.textContent = "0";
+  finishBtn.disabled = false;
+  finishBtn.click();
+});
+
 
 finishBtn.addEventListener("click", async () => {
   const user = auth.currentUser;
@@ -83,9 +99,27 @@ finishBtn.addEventListener("click", async () => {
     await setDoc(doc(db, "users", user.uid), {
       ...onboardingData,
       onboardingComplete: true,
-      //createdAt: serverTimestamp()
     },
     {merge:true});
+
+      const selectedCards = document.querySelectorAll(".habit-picker-card.selected");
+    const habitPromises = [];
+
+    selectedCards.forEach(card => {
+      habitPromises.push(
+        addDoc(collection(db, "users", user.uid, "habits"), {
+          name: card.dataset.habit,
+          category: card.dataset.category,
+          difficulty: card.dataset.difficulty,
+          frequency: "daily",
+          direction: "build",
+          completions: {},
+          createdAt: new Date()
+        })
+      );
+    });
+
+    await Promise.all(habitPromises);
 
     // After saving onboarding => go to dashboard
     window.location.href = "dashboard.html";

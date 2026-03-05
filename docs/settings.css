@@ -11,7 +11,7 @@
 
 .page-header h1 {
   font-size: 1.8rem;
-  color: #333;
+  color: #1a1a2e;
   margin-bottom: 0.25rem;
   text-align: left;
 }
@@ -71,7 +71,7 @@
 .toggle-label {
   font-size: 0.95rem;
   font-weight: 600;
-  color: #333;
+  color: #1a1a2e;
 }
 
 .toggle-desc {
@@ -254,4 +254,13 @@
     margin-right: 0;
     justify-content: center;
   }
+}
+.settings-btn.primary {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
+  color: white;
+}
+
+.settings-btn.primary:hover {
+  opacity: 0.9;
+  background: linear-gradient(135deg, #7c3aed, #4f46e5);
 }
