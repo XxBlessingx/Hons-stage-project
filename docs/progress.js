@@ -22,10 +22,16 @@ onAuthStateChanged(auth, async (user) => {
     window.location.href = "login.html";
     return;
   }
+ const habits = [];
 
-  const snapshot = await getDocs(collection(db, "users", user.uid, "habits"));
-  const habits = [];
-  snapshot.forEach(doc => habits.push({ id: doc.id, ...doc.data() }));
+ try {
+    const snapshot = await getDocs(collection(db, "users", user.uid, "habits"));
+    snapshot.forEach(doc => habits.push({ id: doc.id, ...doc.data() }));
+  } catch (err) {
+    console.error("Failed to load progress data:", err);
+    document.querySelector(".progress-main").innerHTML = "<p>Failed to load progress. Please refresh.</p>";
+    return;
+  }
 
   const behaviour = new BehaviourEngine(habits);
 
@@ -116,3 +122,7 @@ function renderHabitPerformance(behaviour) {
     container.appendChild(wrapper);
   });
 }
+document.getElementById("logout").addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.href = "login.html";
+});

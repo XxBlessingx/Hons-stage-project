@@ -93,17 +93,22 @@ onAuthStateChanged(auth, async (user) => {
 
 // LOAD AND RENDER HABITS
 async function loadHabits(uid, aiConsent ) {
-  habitList.innerHTML = "";
+ habitList.innerHTML = "";
 
   const habitsRef = collection(db, "users", uid, "habits");
-  const snapshot = await getDocs(habitsRef);
-
   const today = new Date().toISOString().split("T")[0];
   const allHabits = [];
 
-  snapshot.forEach((docSnap) => {
-    allHabits.push({ id: docSnap.id, ...docSnap.data() });
-  });
+  try {
+    const snapshot = await getDocs(habitsRef);
+    snapshot.forEach((docSnap) => {
+      allHabits.push({ id: docSnap.id, ...docSnap.data() });
+    });
+  } catch (err) {
+    console.error("Failed to load habits:", err);
+    habitList.innerHTML = "<p>Failed to load habits. Please refresh.</p>";
+    return;
+  }
 
   // Behaviour engine
   const behaviour = new BehaviourEngine(allHabits);
@@ -309,14 +314,13 @@ function renderHabit(id, habitData, uid) {
 
     if (habit.completions && habit.completions[today]) return;
 
-    await updateDoc(habitRef, {
-      completions: {
-        ...(habit.completions || {}),
-        [today]: true
-      }
-    });
-
-    await loadHabits(uid ,currentAiConsent );
+    try {
+      await updateDoc(habitRef, {completions: { ...(habit.completions || {}), [today]: true }});
+      await loadHabits(uid, currentAiConsent);
+    } catch (err) {
+      console.error("Failed to complete habit:", err);
+      alert("Could not save completion. Please try again.");
+    }
   });
 
   const buttonContainer = document.createElement("div");
@@ -350,8 +354,13 @@ function renderHabit(id, habitData, uid) {
 
   delBtn.addEventListener("click", async () => {
     if (confirm("Are you sure you want to delete this habit?")) {
-      await deleteDoc(doc(db, "users", uid, "habits", id));
-      await loadHabits(uid, currentAiConsent);
+      try {
+        await deleteDoc(doc(db, "users", uid, "habits", id));
+        await loadHabits(uid, currentAiConsent);
+      } catch (err) {
+        console.error("Failed to delete habit:", err);
+        alert("Could not delete habit. Please try again.");
+      }
     }
   });
 
@@ -377,7 +386,7 @@ if (saveHabitBtn) {
 
     const habitName = modalHabitInput.value.trim();
     if (!habitName) return;
-
+    try{
     if (editingHabitId) {
       await updateDoc(
         doc(db, "users", user.uid, "habits", editingHabitId),
@@ -412,7 +421,11 @@ if (saveHabitBtn) {
     modalHabitInput.value = "";
     modal.classList.add("hidden");
     emptyState.classList.add("hidden");
-  });
+  }catch(error){
+    console.error("Failed to save habit:", error);
+    alert("Could not save habit. Please try again");
+  }
+});
 }
 
 // MODAL CONTROLS
