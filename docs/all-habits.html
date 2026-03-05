@@ -6,11 +6,16 @@
         <link rel="stylesheet" href="styles.css" />
     </head>
     <body>
-  <nav class="app-nav">
-    <div class="nav-links">
-      <a href="dashboard.html" class="nav-link"> Today's Habits </a>
-    </div>
-  </nav>
+   <header class="top-nav">
+      <a href="dashboard.html" class="logo">🔥 HabitIQ</a>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="all-habits.html" class="active">All Habits</a>
+        <a href="profile.html">Profile</a>
+        <a href="settings.html">Settings</a>
+      </nav>
+      <button id="logout" class="logout-btn">Log out</button>
+    </header>
 
   <main class="dashboard">
     <h1>All Habits</h1>
@@ -50,12 +55,12 @@
 
     <div id="empty-state" class="empty-state hidden">
       <p>No habits yet. Create your first habit!</p>
-      <button id="open-modal" class="primary-btn">+ Create Habit</button>
+      <button id="open-modal-empty" class="primary-btn">+ Create Habit</button>
     </div>
       <button id="open-modal" class="floating-btn">+</button>
   </main>
 
-  <!-- Habit Modal (copied from dashboard.html) -->
+  
   <div id="habit-modal" class="modal hidden">
     <div class="modal-content">
       <span id="close-modal" class="close-btn">&times;</span>
@@ -147,9 +152,6 @@
         </div>
       </div>
 
-    <button id="logout" class="logout-btn">Log out</button>
-  </main>
-  
   <div class="modal-actions">
         <button id="cancel-habit" class="btn-secondary">Cancel</button>
         <button id="save-habit" class="btn-primary">Add Habit</button>

@@ -218,4 +218,46 @@ detectStreakRisk() {
     
     return unlocked;
   }
+
+  calculateLongestStreak() {
+  if (!this.habits || this.habits.length === 0) return 0;
+
+  let longest = 0;
+  let current = 0;
+
+  // Collect all completion dates across habits
+  const completionDates = new Set();
+
+  this.habits.forEach(habit => {
+    const completions = habit.completions || {};
+    Object.keys(completions).forEach(date => {
+      if (completions[date]) completionDates.add(date);
+    });
+  });
+
+  const sortedDates = Array.from(completionDates).sort();
+
+  for (let i = 0; i < sortedDates.length; i++) {
+    if (i === 0) {
+      current = 1;
+    } else {
+      const prev = new Date(sortedDates[i - 1]);
+      const curr = new Date(sortedDates[i]);
+
+      const diff = (curr - prev) / (1000 * 60 * 60 * 24);
+
+      if (diff === 1) {
+        current++;
+      } else {
+        current = 1;
+      }
+    }
+
+    if (current > longest) longest = current;
+  }
+
+  return longest;
+}
+
+
 }

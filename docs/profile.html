@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>HabitIQ | Your Profile</title>
+    <link rel="stylesheet" href="styles.css"/>
+  </head>
+  <body>
+
+    <header class="top-nav">
+      <a href="dashboard.html" class="logo">🔥 HabitIQ</a>
+      <nav>
+        <a href="dashboard.html">Dashboard</a>
+        <a href="all-habits.html">All Habits</a>
+        <a href="profile.html" class="active">Profile</a>
+        <a href="progress.html"> View Progress</a>
+        <a href="settings.html">Settings</a>
+      </nav>
+      <button id="logout" class="logout-btn">Log out</button>
+    </header>
+
+    <main class="profile-main">
+
+      <div class="page-header">
+        <h1>Profile</h1>
+        <p>Your account details and progress summary.</p>
+      </div>
+
+      <!-- Account Card -->
+      <div class="profile-card">
+        <div class="profile-avatar" id="profile-avatar">?</div>
+        <div class="profile-info">
+          <h2 id="profile-name">Loading...</h2>
+          <p id="profile-email">Loading...</p>
+          <p class="profile-joined" id="profile-joined"></p>
+        </div>
+      </div>
+
+      <!-- Stats Cards -->
+      <div class="stats-grid">
+
+        <div class="stat-card">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-value" id="stat-streak">0</div>
+          <div class="stat-label">Current Streak</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">📊</div>
+          <div class="stat-value" id="stat-completion">0%</div>
+          <div class="stat-label">Overall Completion Rate</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">📅</div>
+            <div class="stat-value" id="stat-total-habits">0</div>
+            <div class="stat-label">Total Habits</div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-value" id="stat-risk">Low</div>
+            <div class="stat-label">Risk Level</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🏆</div>
+            <div class="stat-value" id="stat-longest-streak">0</div>
+            <div class="stat-label">Longest Streak</div>
+        </div>
+      </div>
+
+      <div class="profile-card">
+  <div class="profile-info">
+    <h3>Your Behaviour Profile</h3>
+
+    <p><strong>Consistency:</strong> <span id="profile-consistency">—</span></p>
+    <p><strong>Main Barrier:</strong> <span id="profile-barrier">—</span></p>
+    <p><strong>Focus Area:</strong> <span id="profile-habitType">—</span></p>
+    <p><strong>Support Style:</strong> <span id="profile-supportStyle">—</span></p>
+
+  </div>
+</div>
+
+    </main>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+      import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+      import { getFirestore, doc, getDoc, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+      import { BehaviourEngine } from "./behaviour-engine.js";
+      import { ProgressTracker } from "./progress-tracker.js";
+
+      const firebaseConfig = {
+        apiKey: "AIzaSyDUPdCJIpj09iUSHL4Dm_ZwbYuHzzq_SmM",
+        authDomain: "habitiq-364b5.firebaseapp.com",
+        projectId: "habitiq-364b5",
+        storageBucket: "habitiq-364b5.firebasestorage.app",
+        messagingSenderId: "825959188014",
+        appId: "1:825959188014:web:ec3fc6ed82a076be4f01bf"
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const auth = getAuth(app);
+      const db = getFirestore(app);
+
+      onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = "login.html"; return; }
+
+        // User details
+        const userSnap = await getDoc(doc(db, "users", user.uid));
+        if (!userSnap.exists()) return;
+        const userData = userSnap.data();
+
+        document.getElementById("profile-name").textContent = userData.name || "No name set";
+        document.getElementById("profile-email").textContent = user.email;
+        document.getElementById("profile-avatar").textContent = (userData.name || "?")[0].toUpperCase();
+        
+        document.getElementById("profile-consistency").textContent = userData.consistency || "Not set";
+        document.getElementById("profile-barrier").textContent = userData.barrier || "Not set";
+        document.getElementById("profile-habitType").textContent = userData.habitType || "Not set";
+        document.getElementById("profile-supportStyle").textContent = userData.supportStyle || "Not set";
+
+        if (userData.createdAt) {
+          const joined = userData.createdAt.toDate
+            ? userData.createdAt.toDate()
+            : new Date(userData.createdAt);
+          document.getElementById("profile-joined").textContent =
+            `Member since ${joined.toLocaleDateString("en-GB", { month: "long", year: "numeric" })}`;
+        }
+
+        // Habits stats
+        const habitsSnap = await getDocs(collection(db, "users", user.uid, "habits"));
+        const habits = [];
+        const tracker = new ProgressTracker(habits);
+        const currentStreak = tracker.calculateStreak();
+        const longestStreak = tracker.calculateLongestStreak();
+        document.getElementById("stat-streak").textContent = currentStreak;
+        document.getElementById("stat-longest-streak").textContent = longestStreak;
+        
+        habitsSnap.forEach(d => habits.push(d.data()));
+        document.getElementById("stat-total-habits").textContent = habits.length;
+
+        const behaviour = new BehaviourEngine(habits);
+        const riskProfile = behaviour.generateRiskProfile();
+        
+        document.getElementById("stat-risk").textContent = riskProfile.riskLevel;
+
+        // Current streak
+        /*let streak = 0;
+        const today = new Date();
+        for (let i = 0; i < 365; i++) {
+          const date = new Date(today);
+          date.setDate(today.getDate() - i);
+          const dateStr = date.toISOString().split("T")[0];
+          const anyComplete = habits.some(h => h.completions && h.completions[dateStr]);
+          if (anyComplete) streak++;
+          else break;
+        }
+        document.getElementById("stat-streak").textContent = streak;*/
+
+        // Overall completion rate
+        let totalPossible = 0;
+        let totalCompleted = 0;
+        habits.forEach(habit => {
+          if (habit.completions) {
+            const days = Object.keys(habit.completions);
+            totalCompleted += days.filter(d => habit.completions[d]).length;
+          }
+          if (habit.createdAt) {
+            const created = habit.createdAt.toDate
+              ? habit.createdAt.toDate()
+              : new Date(habit.createdAt);
+            const daysSince = Math.floor((today - created) / (1000 * 60 * 60 * 24)) + 1;
+            totalPossible += daysSince;
+          }
+        });
+        const rate = totalPossible > 0 ? Math.round((totalCompleted / totalPossible) * 100) : 0;
+        document.getElementById("stat-completion").textContent = `${rate}%`;
+      });
+
+      document.getElementById("logout").addEventListener("click", async () => {
+        await signOut(auth);
+        window.location.href = "login.html";
+      });
+    </script>
+
+  </body>
+</html>

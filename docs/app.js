@@ -46,9 +46,7 @@ const advancedArrow = document.getElementById("advanced-arrow");
 
 let editingHabitId = null;
 // testing purposes - forcing circumstanes
- let currentAiConsent = true;
-//let currentAiConsent = false;
-
+ let currentAiConsent = false;
 
 if (toggleAdvancedBtn) {
   toggleAdvancedBtn.addEventListener("click", () => {
@@ -90,7 +88,7 @@ onAuthStateChanged(auth, async (user) => {
   currentAiConsent = userData.ai_consent;
   //loadHabits(user.uid,  userData.ai_consent);
   // for testing purpose - forcusing circumstances 
-  loadHabits(user.uid, true);
+  loadHabits(user.uid, userData.ai_consent);
 });
 
 // LOAD AND RENDER HABITS

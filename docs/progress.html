@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <title>HabitIQ | Progress</title>
+        <link rel="stylesheet" href="styles.css"/>
+    </head>
+
+    <body>
+
+<header class="top-nav">
+  <a href="dashboard.html" class="logo">🔥 HabitIQ</a>
+  <nav>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="all-habits.html">All Habits</a>
+    <a href="progress.html" class="active"> View Progress</a>
+    <a href="profile.html">Profile</a>
+    <a href="settings.html">Settings</a>
+  </nav>
+  <button id="logout" class="logout-btn">Log out</button>
+</header>
+
+<main class="progress-main">
+
+  <!-- WEEKLY LEVEL CARD -->
+  <section class="progress-card level-card">
+    <h2>📊 Weekly Overview</h2>
+    <div class="level-stats">
+      <p><strong>Completion Rate:</strong> <span id="weekly-rate">0%</span></p>
+      <p><strong>Risk Level:</strong> <span id="risk-level">Low</span></p>
+      <p><strong>Strongest Habit:</strong> <span id="highest-habit">—</span></p>
+      <p><strong>Needs Attention:</strong> <span id="lowest-habit">—</span></p>
+    </div>
+  </section>
+
+  <!-- TREND CARD -->
+  <section class="progress-card trend-card">
+    <h2>📈 Momentum Trend</h2>
+    <div class="trend-content">
+      <div id="trend-direction" class="trend-indicator">Stable</div>
+      <p>This week vs last week</p>
+      <p id="trend-difference"></p>
+    </div>
+  </section>
+
+  <!-- MILESTONE BADGES -->
+  <section class="progress-card badge-card">
+    <h2>🏆 Milestones</h2>
+    <div id="milestone-container" class="badge-container">
+      <!-- badges dynamically inserted -->
+    </div>
+  </section>
+
+  <!-- HABIT PERFORMANCE -->
+  <section class="progress-card habit-performance-card">
+    <h2>🎯 Habit Performance</h2>
+    <div id="habit-performance-container">
+      <!-- bars inserted dynamically -->
+    </div>
+  </section>
+
+</main>
+
+<script type="module" src="progress.js"></script>
+
+</body>
+
+</html>

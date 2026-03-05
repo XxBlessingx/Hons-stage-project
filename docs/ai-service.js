@@ -1,19 +1,19 @@
 // ai-service.js — handles all AI insight generation for HabitIQ
 // change this to claude for the api intergration
 
-const GEMINI_API_KEY = "AIzaSyBPk4AEb08JmwesoteyNiIYAsW1z0rj_-M";
-const GEMINI_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-lite:generateContent?key=${GEMINI_API_KEY}`;
+const CLAUDE_API_KEY = "YOUR_API_KEY_HERE";
+const CLAUDE_URL = "https://api.anthropic.com/v1/messages";
 
 let insightCache = null;
 let insightCacheDate = null;
 
-export async function getAIInsight(riskProfile, reinforcementProfile, achievementProfile, aiConsent) {
+export async function getAIInsight(riskProfile, reinforcementProfile, achievementProfile, aiConsent, userProfile) {
 
   if (!aiConsent) {
-    return { success: false, insight: getFallbackInsight(riskProfile, reinforcementProfile, achievementProfile)};
+    return { success: false, insight: getFallbackInsight(riskProfile, reinforcementProfile, achievementProfile) };
   }
 
-   const todayStr = new Date().toISOString().split("T")[0];
+  const todayStr = new Date().toISOString().split("T")[0];
   if (insightCache && insightCacheDate === todayStr) {
     return { success: true, insight: insightCache };
   }
@@ -54,12 +54,20 @@ export async function getAIInsight(riskProfile, reinforcementProfile, achievemen
     ? "declining"
     : "stable";
 
-  const prompt = `You are a supportive performance coach helping a university student build sustainable habits.
-
-Weekly summary:
-- Completion rate: ${Math.round(riskProfile.weeklyRate * 100)}%
-- Trend: ${trend} vs last week (last week: ${Math.round(reinforcementProfile.previousRate * 100)}%, this week: ${Math.round(reinforcementProfile.currentRate * 100)}%)
-- Risk level: ${riskProfile.riskLevel}
+  const behaviourContext = `
+  User behavioural profile:
+  - Self-rated consistency: ${userProfile?.consistency || "unknown"}
+  - Main barrier: ${userProfile?.barrier || "unknown"}
+  - Focus area: ${userProfile?.habitType || "mixed"}
+  - Preferred support style: ${userProfile?.supportStyle || "balanced"}
+  `;
+  
+    const prompt = `You are a supportive performance coach helping a university student build sustainable habits.
+    ${behaviourContext}
+    Weekly summary:
+    - Completion rate: ${Math.round(riskProfile.weeklyRate * 100)}%
+    - Trend: ${trend} vs last week (last week: ${Math.round(reinforcementProfile.previousRate * 100)}%, this week: ${Math.round(reinforcementProfile.currentRate * 100)}%)
+    - Risk level: ${riskProfile.riskLevel}
 
 Habit insights:
 ${habitLines.join("\n")}
@@ -73,18 +81,24 @@ Write a 2-3 sentence personalised insight. Rules:
 - Suggest one small realistic adjustment
 - If progress is strong, acknowledge it first
 - If struggling, acknowledge the difficulty before suggesting a fix
-- Sound like a knowledgeable friend, not clinical`;
+- Sound like a knowledgeable friend, not a therapist
+- Adapt tone based on preferred support style (accountability = direct, gentle reminders = softer tone)
+- If user reports low consistency, focus on small wins
+- If user reports motivation issues, emphasise identity and purpose`
+;
 
   try {
-    const response = await fetch(GEMINI_URL, {
+    const response = await fetch(CLAUDE_URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-api-key": CLAUDE_API_KEY,
+        "anthropic-version": "2023-06-01"
+      },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          maxOutputTokens: 300,
-          temperature: 0.7
-        }
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 300,
+        messages: [{ role: "user", content: prompt }]
       })
     });
 
@@ -94,12 +108,11 @@ Write a 2-3 sentence personalised insight. Rules:
     }
 
     const data = await response.json();
-    const insight = data.candidates[0].content.parts[0].text.trim();
+    const insight = data.content[0].text.trim();
 
-     
-        insightCache = insight;
-        insightCacheDate = todayStr;
-        return { success: true, insight };
+    insightCache = insight;
+    insightCacheDate = todayStr;
+    return { success: true, insight };
 
   } catch (err) {
     console.error("AI insight failed:", err);
