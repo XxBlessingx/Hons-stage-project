@@ -21,6 +21,12 @@
       <label for="password">Password</label>
       <input type="password" id="password" placeholder="Password" required />
 
+      <ul class="password-rules">
+    <li id="rule-length">At least 8 char.</li>
+    <li id="rule-upper">One uppercase letter</li>
+    <li id="rule-number">At least one number</li>
+  </ul>
+
       <button type="submit">Create Account</button>
     </form>
 
@@ -56,6 +62,16 @@
     const db = getFirestore(app);
 
     const form = document.getElementById("signup-form");
+    
+
+    const passwordInput = document.getElementById("password");
+    const submitBtn = form.querySelector("button[type='submit']"); 
+    passwordInput.addEventListener("input", () => {
+      const val = passwordInput.value;
+      document.getElementById("rule-length").classList.toggle("passed", val.length >= 8);
+      document.getElementById("rule-upper").classList.toggle("passed", /[A-Z]/.test(val));
+      document.getElementById("rule-number").classList.toggle("passed", /[0-9]/.test(val));
+    });
 
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
@@ -63,6 +79,15 @@
       const name = document.getElementById("name").value;
       const email = document.getElementById("email").value;
       const password = document.getElementById("password").value;
+
+      if (password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+    alert("Password must be at least 8 characters, include one uppercase letter and one number.");
+    return;
+  }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent ="Creating account....";
+
 
       try {
         const userCredential = await createUserWithEmailAndPassword(
@@ -86,8 +111,19 @@
         window.location.href = "onboarding.html";
         //console.log(userCredential.user);
       } catch (error) {
-        alert(error.message);
-        console.error(error);
+        submitBtn.disabled = false;
+        submitBtn.textContent ="Create Account";
+
+        const errorMessages = {
+      "auth/email-already-in-use": "An account with this email already exists. Try logging in instead.",
+      "auth/invalid-email": "Please enter a valid email address.",
+      "auth/weak-password": "Password is too weak. Please follow the requirements above.",
+      "auth/network-request-failed": "Network error. Please check your connection and try again."
+    };
+
+    const message = errorMessages[error.code] || "Something went wrong. Please try again.";
+    alert(message);
+    console.error(error);
       }
     });
   </script>

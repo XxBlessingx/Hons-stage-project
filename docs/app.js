@@ -89,6 +89,10 @@ onAuthStateChanged(auth, async (user) => {
   //loadHabits(user.uid,  userData.ai_consent);
   // for testing purpose - forcusing circumstances 
   loadHabits(user.uid, userData.ai_consent);
+
+  if (!userData.tutorialComplete) {
+  setTimeout(() => startTutorial(), 1500); 
+}
 });
 
 // LOAD AND RENDER HABITS
@@ -531,6 +535,119 @@ if (closeModalBtn) {
 }
 if (cancelBtn) {
   cancelBtn.addEventListener("click", () => modal.classList.add("hidden"));
+}
+
+// TUTORIAL
+function startTutorial() {
+  const steps = [
+    {
+      target: ".streak-header",
+      text: "🔥 This is your streak counter. Complete all your habits every day to keep it growing!",
+    },
+    {
+      target: ".weekly-calendar",
+      text: "📅 Your weekly calendar shows how consistent you've been. Green means a full day, yellow means partial.",
+    },
+    {
+      target: ".ai-insight-card",
+      text: "🤖 Your AI insight engine analyses your habits and gives you personalised feedback every day.",
+    },
+    {
+      target: "#open-modal",
+      text: "➕ Tap this button to add your first habit. Try adding something simple to start!",
+    },
+    {
+      target: "#habit-list",
+      text: "✅ Your habits appear here. Tap the circle on any habit to mark it as done for today.",
+    },
+  ];
+
+  let currentStep = 0;
+  const overlay = document.getElementById("tutorial-overlay");
+  const tooltip = document.getElementById("tutorial-tooltip");
+  const tooltipText = document.getElementById("tutorial-text");
+  const nextBtn = document.getElementById("tutorial-next");
+  const skipBtn = document.getElementById("tutorial-skip");
+  const stepIndicator = document.getElementById("tutorial-step-indicator");
+
+  let highlightedEl = null;
+
+  function showStep(index) {
+    // Remove previous highlight
+    if (highlightedEl) {
+      highlightedEl.classList.remove("tutorial-highlight");
+    }
+
+    const step = steps[index];
+    const target = document.querySelector(step.target);
+
+    if (!target) {
+      endTutorial();
+      return;
+    }
+
+    // Highlight target
+    highlightedEl = target;
+    target.classList.add("tutorial-highlight");
+
+    // Update tooltip text
+    tooltipText.textContent = step.text;
+    stepIndicator.textContent = `${index + 1} of ${steps.length}`;
+
+    // Update button text on last step
+    nextBtn.textContent = index === steps.length - 1 ? "Done ✓" : "Next →";
+
+    // Position tooltip near the target
+    const rect = target.getBoundingClientRect();
+    const tooltipWidth = 280;
+    const tooltipHeight = 140;
+    const margin = 16;
+
+    let top = rect.bottom + margin;
+    let left = rect.left;
+
+    // Keep tooltip within viewport
+    if (left + tooltipWidth > window.innerWidth) {
+      left = window.innerWidth - tooltipWidth - margin;
+    }
+    if (top + tooltipHeight > window.innerHeight) {
+      top = rect.top - tooltipHeight - margin;
+    }
+
+    tooltip.style.top = `${top}px`;
+    tooltip.style.left = `${left}px`;
+
+    overlay.classList.remove("hidden");
+    overlay.classList.add("active");
+  }
+
+  function endTutorial() {
+    overlay.classList.add("hidden");
+    overlay.classList.remove("active");
+    if (highlightedEl) {
+      highlightedEl.classList.remove("tutorial-highlight");
+    }
+
+    // Save to Firestore so it never shows again
+    const user = auth.currentUser;
+    if (user) {
+      updateDoc(doc(db, "users", user.uid), { tutorialComplete: true })
+        .catch(err => console.error("Failed to save tutorial state:", err));
+    }
+  }
+
+  nextBtn.addEventListener("click", () => {
+    currentStep++;
+    if (currentStep >= steps.length) {
+      endTutorial();
+    } else {
+      showStep(currentStep);
+    }
+  });
+
+  skipBtn.addEventListener("click", endTutorial);
+
+  showStep(0);
 }
 
 // LOGOUT

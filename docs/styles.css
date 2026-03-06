@@ -1355,3 +1355,105 @@ body.high-contrast p {
   .stats-grid { grid-template-columns: 1fr; }
   .profile-card { flex-direction: column; text-align: center; }
 }
+
+.password-rules {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.password-rules li {
+  font-size: 0.78rem;
+  color: #aaa;
+  background: #f5f5f5;
+  padding: 3px 10px;
+  border-radius: 99px;
+  margin: 0;
+  transition: all 0.3s ease;
+}
+
+.password-rules li.passed {
+  color: #166534;
+  background: #dcfce7;
+  box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+}
+
+.tutorial-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.7);
+  z-index: 1000;
+  pointer-events: none;
+}
+
+.tutorial-overlay.active {
+  pointer-events: all;
+}
+
+.tutorial-highlight {
+  outline: 3px solid #7c3aed;
+  outline-offset: 4px;
+  border-radius: 12px;
+  box-shadow: 0 0 0 4px rgba(124,58,237,0.3), 0 0 20px rgba(124,58,237,0.4);
+  position: relative;
+  z-index: 1001;
+  background: white;
+}
+
+.tutorial-tooltip {
+  position: fixed;
+  background: white;
+  border-radius: 14px;
+  padding: 1.25rem 1.5rem;
+  width: 280px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+  z-index: 1002;
+  pointer-events: all;
+}
+
+.tutorial-tooltip p {
+  margin: 0 0 1rem;
+  font-size: 0.92rem;
+  color: #333;
+  line-height: 1.5;
+}
+
+.tutorial-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tutorial-skip {
+  background: none;
+  border: none;
+  color: #aaa;
+  font-size: 0.85rem;
+  cursor: pointer;
+  padding: 0;
+  margin: 0;
+}
+
+.tutorial-skip:hover {
+  color: #666;
+  background: none;
+}
+
+.tutorial-progress {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  color: #aaa;
+  text-align: center;
+}
+
+#tutorial-next {
+  margin: 0;
+  padding: 0.5rem 1rem;
+  font-size: 0.85rem;
+}
