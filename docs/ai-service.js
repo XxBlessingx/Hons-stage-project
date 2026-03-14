@@ -1,7 +1,7 @@
-// ai-service.js — handles all AI insight generation for HabitIQ
-// change this to claude for the api intergration
+// // ai-service.js — handles all AI insight generation for HabitIQ
+// // using gemini for testing then before submission sqitching change this to claude for the api intergration
 
-const CLAUDE_API_KEY = "YOUR_API_KEY_HERE";
+const CLAUDE_API_KEY = "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";
 const CLAUDE_URL = "https://api.anthropic.com/v1/messages";
 
 let insightCache = null;
@@ -93,7 +93,8 @@ Write a 2-3 sentence personalised insight. Rules:
       headers: {
         "Content-Type": "application/json",
         "x-api-key": CLAUDE_API_KEY,
-        "anthropic-version": "2023-06-01"
+        "anthropic-version": "2023-06-01",
+        "anthropic-dangerous-direct-browser-access": "true"
       },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
@@ -137,3 +138,4 @@ function getFallbackInsight(riskProfile, reinforcementProfile, achievementProfil
     return "Focus on completing just one habit each day this week to rebuild your consistency.";
   return "You're building consistency. Keep going.";
 }
+
