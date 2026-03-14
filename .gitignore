@@ -11,3 +11,6 @@ obj/
 *.swp
 *.suo
 *.tmp
+
+#api key
+docs/ai-service.js
