@@ -51,7 +51,14 @@ steps.forEach((step, index) => {
 
   optionButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-      onboardingData[key] = btn.dataset.value;
+      // Convert "true"/"false" strings to real booleans for ai_consent
+      if (btn.dataset.value === "true") {
+          onboardingData[key] = true;
+      } else if (btn.dataset.value === "false") {
+          onboardingData[key] = false;
+      } else {
+          onboardingData[key] = btn.dataset.value;
+      }
 
       optionButtons.forEach(b => b.classList.remove("selected"));
       btn.classList.add("selected");

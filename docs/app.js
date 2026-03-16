@@ -46,7 +46,7 @@ const advancedArrow = document.getElementById("advanced-arrow");
 
 let editingHabitId = null;
 // testing purposes - forcing circumstanes
- let currentAiConsent = false;
+ let currentAiConsent = false; // defalut but will be overwritten by Firestore value
 
 if (toggleAdvancedBtn) {
   toggleAdvancedBtn.addEventListener("click", () => {
@@ -153,6 +153,8 @@ if (reinforcementProfile.strongConsistency || achievementProfile.length > 0) {
 } else if (reinforcementProfile.momentum) {
   aiCard.classList.add("momentum");
 }
+
+initInsightFeedback();
 
   // Weekly calendar
   renderWeeklyCalendar(allHabits);
@@ -537,6 +539,49 @@ if (cancelBtn) {
   cancelBtn.addEventListener("click", () => modal.classList.add("hidden"));
 }
 
+function initInsightFeedback() {
+    const feedbackDiv = document.getElementById('insight-feedback');
+    const acceptBtn = document.getElementById('insight-accept');
+    const rejectBtn = document.getElementById('insight-reject');
+    const thanksMsg = document.getElementById('feedback-thanks');
+
+    // Reset state each time it's called
+    thanksMsg.classList.add('hidden');
+    acceptBtn.disabled = false;
+    rejectBtn.disabled = false;
+    acceptBtn.style.opacity = '1';
+    rejectBtn.style.opacity = '1';
+
+    // Show buttons immediately since insight is already loaded
+    feedbackDiv.classList.remove('hidden');
+
+    // Remove old listeners by cloning buttons
+    const newAccept = acceptBtn.cloneNode(true);
+    const newReject = rejectBtn.cloneNode(true);
+    acceptBtn.parentNode.replaceChild(newAccept, acceptBtn);
+    rejectBtn.parentNode.replaceChild(newReject, rejectBtn);
+
+    newAccept.addEventListener('click', () => {
+        const insight = document.getElementById('ai-insight').innerText;
+        saveFeedback('accepted', insight);
+        thanksMsg.classList.remove('hidden');
+        newAccept.disabled = true;
+        newReject.disabled = true;
+        newAccept.style.opacity = '0.5';
+        newReject.style.opacity = '0.5';
+    });
+
+    newReject.addEventListener('click', () => {
+        const insight = document.getElementById('ai-insight').innerText;
+        saveFeedback('rejected', insight);
+        thanksMsg.classList.remove('hidden');
+        newAccept.disabled = true;
+        newReject.disabled = true;
+        newAccept.style.opacity = '0.5';
+        newReject.style.opacity = '0.5';
+    });
+}
+
 // TUTORIAL
 function startTutorial() {
   const steps = [
@@ -649,7 +694,6 @@ function startTutorial() {
 
   showStep(0);
 }
-
 // LOGOUT
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);

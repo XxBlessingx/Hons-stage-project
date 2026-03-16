@@ -12,5 +12,4 @@ obj/
 *.suo
 *.tmp
 
-#api key
-docs/ai-service.js
+
