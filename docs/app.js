@@ -580,6 +580,37 @@ function initInsightFeedback() {
         newAccept.style.opacity = '0.5';
         newReject.style.opacity = '0.5';
     });
+
+    const editBtn = document.getElementById('insight-edit');
+const editContainer = document.getElementById('edit-container');
+const editTextarea = document.getElementById('insight-edit-text');
+const saveEditBtn = document.getElementById('insight-save-edit');
+
+const newEditBtn = editBtn.cloneNode(true);
+editBtn.parentNode.replaceChild(newEditBtn, editBtn);
+
+newEditBtn.addEventListener('click', () => {
+    const currentInsight = document.getElementById('ai-insight').innerText;
+    editTextarea.value = currentInsight;
+    editContainer.classList.remove('hidden');
+    newEditBtn.disabled = true;
+    newEditBtn.style.opacity = '0.5';
+});
+
+saveEditBtn.addEventListener('click', () => {
+    const editedInsight = editTextarea.value.trim();
+    if (!editedInsight) return;
+    document.getElementById('ai-insight').innerText = editedInsight;
+    saveFeedback('edited', editedInsight);
+    editContainer.classList.add('hidden');
+    thanksMsg.classList.remove('hidden');
+    newAccept.disabled = true;
+    newReject.disabled = true;
+    newEditBtn.disabled = true;
+    newAccept.style.opacity = '0.5';
+    newReject.style.opacity = '0.5';
+});
+
 }
 
 // TUTORIAL

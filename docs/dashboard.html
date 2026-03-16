@@ -56,10 +56,15 @@
                     </div>
                       <div id="insight-feedback" class="insight-feedback hidden">
                         <p class="feedback-label">Was this helpful?</p>
-                        <div class="feedback-buttons">
-                            <button id="insight-accept" class="feedback-btn accept">✓ Helpful</button>
-                            <button id="insight-reject" class="feedback-btn reject">✗ Not relevant</button>
-                        </div>
+                    <div class="feedback-buttons">
+                        <button id="insight-accept" class="feedback-btn accept">✓ Helpful</button>
+                        <button id="insight-edit" class="feedback-btn edit">✏ Edit</button>
+                        <button id="insight-reject" class="feedback-btn reject">✗ Not relevant</button>
+                    </div>
+                    <div id="edit-container" class="hidden">
+                        <textarea id="insight-edit-text" rows="3"></textarea>
+                        <button id="insight-save-edit" class="feedback-btn accept">Save</button>
+                    </div>
                         <p id="feedback-thanks" class="feedback-thanks hidden">Thanks for your feedback!</p>
                     </div>
                 </div>

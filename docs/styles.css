@@ -1575,3 +1575,21 @@ body.high-contrast p {
     margin-top: 10px;
     font-weight: 500;
 }
+.feedback-btn.edit {
+    background-color: #fff8e1;
+    color: #f57f17;
+}
+
+#edit-container {
+    margin-top: 10px;
+}
+
+#insight-edit-text {
+    width: 100%;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #e0d9ff;
+    font-size: 0.9rem;
+    resize: vertical;
+    margin-bottom: 8px;
+}
