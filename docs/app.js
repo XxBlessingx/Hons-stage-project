@@ -138,10 +138,9 @@ async function loadHabits(uid, aiConsent ) {
   document.getElementById("goal-progress").style.width = `${dailyStats.percentage}%`;
 
   // AI insight card 
-const aiInsightContainer = document.getElementById("ai-insight");
-const aiCard = document.querySelector(".ai-insight-card");
 
-aiCard.classList.remove("momentum", "strong");
+const aiInsightContainer = document.getElementById("ai-insight");
+
 aiInsightContainer.textContent = "Generating insight...";
 
 const user = auth.currentUser;
@@ -152,13 +151,17 @@ const result = await getAIInsight(riskProfile, reinforcementProfile, achievement
 
 aiInsightContainer.textContent = result.insight;
 
-if (reinforcementProfile.strongConsistency || achievementProfile.length > 0) {
-  aiCard.classList.add("strong");
-} else if (reinforcementProfile.momentum) {
-  aiCard.classList.add("momentum");
-}
-
 initInsightFeedback();
+
+const insightModal = document.getElementById("insight-modal");
+const openInsightBtn = document.getElementById("open-insight-modal");
+const closeInsightBtn = document.getElementById("close-insight-modal");
+
+openInsightBtn.addEventListener("click", () => insightModal.classList.remove("hidden"));
+closeInsightBtn.addEventListener("click", () => insightModal.classList.add("hidden"));
+insightModal.addEventListener("click", (e) => {
+  if (e.target === insightModal) insightModal.classList.add("hidden");
+});
 
   // Weekly calendar
   renderWeeklyCalendar(allHabits);
@@ -646,8 +649,8 @@ function startTutorial() {
       text: "📅 Your weekly calendar shows how consistent you've been. Green means a full day, yellow means partial.",
     },
     {
-      target: ".ai-insight-card",
-      text: "🤖 Your AI insight engine analyses your habits and gives you personalised feedback every day.",
+      target: "#open-insight-modal",
+      text: "🤖 Tap here to open your AI Insight Engine — it analyses your habits and gives you personalised feedback every day.",
     },
     {
       target: "#open-modal",

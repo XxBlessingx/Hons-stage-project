@@ -49,25 +49,14 @@
             <!-- History-->
             <section class="habits">
                 <ul id="habit-list"></ul>
-                <div class="ai-insight-card">
-                    <h3>Ai insight engine</h3>
-                    <div id="ai-insight">
-                        You're building consistency. Keep going!
-                    </div>
-                      <div id="insight-feedback" class="insight-feedback hidden">
-                        <p class="feedback-label">Was this helpful?</p>
-                    <div class="feedback-buttons">
-                        <button id="insight-accept" class="feedback-btn accept">✓ Helpful</button>
-                        <button id="insight-edit" class="feedback-btn edit">✏ Edit</button>
-                        <button id="insight-reject" class="feedback-btn reject">✗ Not relevant</button>
-                    </div>
-                    <div id="edit-container" class="hidden">
-                        <textarea id="insight-edit-text" rows="3"></textarea>
-                        <button id="insight-save-edit" class="feedback-btn accept">Save</button>
-                    </div>
-                        <p id="feedback-thanks" class="feedback-thanks hidden">Thanks for your feedback!</p>
-                    </div>
-                </div>
+                <button id="open-insight-modal" class="ai-insight-trigger">
+                    <span class="ai-trigger-icon">✦</span>
+                    <span class="ai-trigger-text">
+                        <span class="ai-trigger-title">AI Insight Engine</span>
+                        <span class="ai-trigger-sub">View your personalised weekly insight</span>
+                    </span>
+                    <span class="ai-trigger-arrow">→</span>
+                </button>
                  
                 <div id="empty-state" class="empty-state hidden">
                     <p> Why not try adding you first habit? </p>
@@ -196,12 +185,34 @@
                 </div>
             </div>
 
+
                 <!--buttons-->
                 <div class="modal-actions">
                     <button id="cancel-habit" class="btn-secondary">Cancel</button>
                     <button id="save-habit" class="btn-primary">Add Habit</button>
                 </div>
     
+            </div>
+        </div>
+
+        <div id="insight-modal" class="modal hidden">
+            <div class="modal-content">
+                <span id="close-insight-modal" class="close-btn">&times;</span>
+                <h2>Your Weekly Insight</h2>
+                <div id="ai-insight">Generating insight...</div>
+                <div id="insight-feedback" class="insight-feedback hidden">
+                    <p class="feedback-label">Was this helpful?</p>
+                    <div class="feedback-buttons">
+                        <button id="insight-accept" class="feedback-btn accept">✓ Helpful</button>
+                        <button id="insight-edit" class="feedback-btn edit">✏ Edit</button>
+                        <button id="insight-reject" class="feedback-btn reject">✗ Not relevant</button>
+                    </div>
+                     <div id="edit-container" class="hidden">
+                        <textarea id="insight-edit-text" rows="3"></textarea>
+                        <button id="insight-save-edit" class="feedback-btn accept">Save</button>
+                    </div>
+                    <p id="feedback-thanks" class="feedback-thanks hidden">Thanks for your feedback!</p>
+                </div>
             </div>
         </div>
 

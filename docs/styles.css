@@ -1593,3 +1593,76 @@ body.high-contrast p {
     resize: vertical;
     margin-bottom: 8px;
 }
+/* ===== AI INSIGHT TRIGGER BUTTON ===== */
+.ai-insight-trigger {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    background: linear-gradient(135deg, #f0f7ff 0%, #f9f9ff 100%);
+    border: 1px solid #e0d9ff;
+    border-left: 4px solid #6c63ff;
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-top: 16px;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 12px rgba(108, 99, 255, 0.08);
+}
+
+.ai-insight-trigger:hover {
+    background: linear-gradient(135deg, #e8f0ff 0%, #f0f0ff 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 16px rgba(108, 99, 255, 0.15);
+}
+
+.ai-trigger-icon {
+    font-size: 1.1rem;
+    color: #6c63ff;
+    flex-shrink: 0;
+}
+
+.ai-trigger-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+}
+
+.ai-trigger-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #6c63ff;
+    text-transform: uppercase;
+}
+
+.ai-trigger-sub {
+    font-size: 0.88rem;
+    color: #555;
+}
+
+.ai-trigger-arrow {
+    font-size: 1rem;
+    color: #b3a8ff;
+    flex-shrink: 0;
+}
+
+/* ===== AI INSIGHT MODAL CONTENT ===== */
+#ai-insight {
+    font-size: 0.95rem;
+    line-height: 1.7;
+    color: #333;
+    margin-bottom: 16px;
+    padding: 14px;
+    background: #fafafa;
+    border-radius: 10px;
+    border: 1px solid #f0f0f0;
+}
+
+.insight-feedback {
+    margin-top: 0;
+    padding-top: 14px;
+    border-top: 1px solid #e0d9ff;
+}
