@@ -144,7 +144,11 @@ const aiCard = document.querySelector(".ai-insight-card");
 aiCard.classList.remove("momentum", "strong");
 aiInsightContainer.textContent = "Generating insight...";
 
-const result = await getAIInsight(riskProfile, reinforcementProfile, achievementProfile, aiConsent);
+const user = auth.currentUser;
+const userSnap2 = await getDoc(doc(db, "users", user.uid));
+const previousFeedback = userSnap2.data()?.lastInsightFeedback || null;
+
+const result = await getAIInsight(riskProfile, reinforcementProfile, achievementProfile, aiConsent, null, previousFeedback);
 
 aiInsightContainer.textContent = result.insight;
 
@@ -221,7 +225,24 @@ function renderWeeklyCalendar(habits) {
     container.appendChild(dayEl);
   }
 }
+// saving the Human-in-the-loop response
+async function saveFeedback(type, insightText) {
+  const user = auth.currentUser;
+  if (!user) return;
 
+  try {
+    const today = new Date().toISOString().split("T")[0];
+    await updateDoc(doc(db, "users", user.uid), {
+      lastInsightFeedback: {
+        type,           // "accepted", "rejected", "edited"
+        insight: insightText,
+        date: today
+      }
+    });
+  } catch (err) {
+    console.error("Failed to save feedback:", err);
+  }
+}
 // RENDER INDIVIDUAL HABIT CARD
 function renderHabit(id, habitData, uid) {
   const today = new Date().toISOString().split("T")[0];

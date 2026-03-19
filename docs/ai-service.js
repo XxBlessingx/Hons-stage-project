@@ -1,13 +1,9 @@
-// // ai-service.js — handles all AI insight generation for HabitIQ
-// // using gemini for testing then before submission sqitching change this to claude for the api intergration
-
-
 const WORKER_URL = "https://habitiq-ai-insight.blessing-angelica.workers.dev";
 
 let insightCache = null;
 let insightCacheDate = null;
 
-export async function getAIInsight(riskProfile, reinforcementProfile, achievementProfile, aiConsent, userProfile) {
+export async function getAIInsight(riskProfile, reinforcementProfile, achievementProfile, aiConsent, userProfile, previousFeedback) {
 
   if (!aiConsent) {
     return { success: false, insight: getFallbackInsight(riskProfile, reinforcementProfile, achievementProfile) };
@@ -61,8 +57,19 @@ export async function getAIInsight(riskProfile, reinforcementProfile, achievemen
   - Focus area: ${userProfile?.habitType || "mixed"}
   - Preferred support style: ${userProfile?.supportStyle || "balanced"}
   `;
+
   
-    const prompt = `You are a supportive performance coach helping a university student build sustainable habits.
+  const feedbackContext = previousFeedback
+    ? `\nPrevious insight feedback: The user marked the last insight as "${previousFeedback.type}".${
+        previousFeedback.type === "rejected"
+          ? " Avoid a similar approach this time."
+          : previousFeedback.type === "edited"
+          ? ` The user edited it to: "${previousFeedback.insight}". Match this tone and style.`
+          : " The user found it helpful — maintain a similar approach."
+      }`
+    : "";
+
+  const prompt = `You are a supportive performance coach helping a university student build sustainable habits.
     ${behaviourContext}
     Weekly summary:
     - Completion rate: ${Math.round(riskProfile.weeklyRate * 100)}%
@@ -74,6 +81,7 @@ ${habitLines.join("\n")}
 
 Context signals:
 ${flags.length > 0 ? flags.map(f => `- ${f}`).join("\n") : "- No major risk signals this week"}
+${feedbackContext}
 
 Write a 2-3 sentence personalised insight. Rules:
 - Be supportive and clear
@@ -84,20 +92,19 @@ Write a 2-3 sentence personalised insight. Rules:
 - Sound like a knowledgeable friend, not a therapist
 - Adapt tone based on preferred support style (accountability = direct, gentle reminders = softer tone)
 - If user reports low consistency, focus on small wins
-- If user reports motivation issues, emphasise identity and purpose`
-;
+- If user reports motivation issues, emphasise identity and purpose`;
 
   try {
-   const response = await fetch(WORKER_URL, {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json"
-  },
-  body: JSON.stringify({
-    habitData: { prompt },
-    previousFeedback: null
-  })
-});
+    const response = await fetch(WORKER_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        habitData: { prompt },
+        previousFeedback: previousFeedback
+      })
+    });
 
     if (!response.ok) {
       const errorData = await response.json();
@@ -134,4 +141,3 @@ function getFallbackInsight(riskProfile, reinforcementProfile, achievementProfil
     return "Focus on completing just one habit each day this week to rebuild your consistency.";
   return "You're building consistency. Keep going.";
 }
-
