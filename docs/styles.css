@@ -1768,3 +1768,21 @@ body.dark-mode .stat-label,
 body.dark-mode .profile-joined {
   color: #a0a0c0 !important;
 }
+body.high-contrast .modal-content {
+  background: #000 !important;
+  color: #fff !important;
+  border: 2px solid #fff;
+}
+
+body.high-contrast .modal-content label,
+body.high-contrast .modal-content h2 {
+  color: #fff !important;
+}
+
+body.high-contrast .modal-content input,
+body.high-contrast .modal-content select,
+body.high-contrast .modal-content textarea {
+  background: #000 !important;
+  color: #fff !important;
+  border: 2px solid #fff !important;
+}
