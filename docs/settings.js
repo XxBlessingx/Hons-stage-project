@@ -18,7 +18,7 @@ const db = getFirestore(app);
 let currentUser = null;
 let userDocRef = null;
 
-// ─── LOAD ACCESSIBILITY PREFS IMMEDIATELY ───────────────────────────────────
+//  LOAD ACCESSIBILITY PREFS IMMEDIATELY 
 // Read from localStorage before auth loads to prevent flash of unstyled content
 function loadLocalPrefs() {
   if (localStorage.getItem("dyslexiaFont") === "true") {
@@ -29,10 +29,14 @@ function loadLocalPrefs() {
     document.body.classList.add("high-contrast");
     document.getElementById("contrast-toggle").checked = true;
   }
+  if (localStorage.getItem("darkMode") === "true") {
+    document.body.classList.add("dark-mode");
+    document.getElementById("dark-mode-toggle").checked = true;
+  }
 }
 loadLocalPrefs();
 
-// ─── HELPERS ────────────────────────────────────────────────────────────────
+//  HELPERS 
 function showSaved() {
   const el = document.getElementById("save-indicator");
   el.classList.remove("hidden");
@@ -46,7 +50,7 @@ function updateConsentStatus(enabled) {
   el.className = enabled ? "consent-status enabled" : "consent-status";
 }
 
-// ─── AUTH GUARD ──────────────────────────────────────────────────────────────
+//  AUTH GUARD 
 onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "login.html";
@@ -66,7 +70,7 @@ onAuthStateChanged(auth, async (user) => {
   updateConsentStatus(aiConsent);
 });
 
-// ─── AI CONSENT TOGGLE ───────────────────────────────────────────────────────
+// for the AI CONSENT TOGGLE 
 document.getElementById("ai-consent-toggle").addEventListener("change", async (e) => {
   const enabled = e.target.checked;
   updateConsentStatus(enabled);
@@ -77,7 +81,7 @@ document.getElementById("ai-consent-toggle").addEventListener("change", async (e
   }
 });
 
-// ─── DYSLEXIA FONT TOGGLE ────────────────────────────────────────────────────
+// accsessabilty feature: DYSLEXIA FONT TOGGLE 
 document.getElementById("font-toggle").addEventListener("change", (e) => {
   const enabled = e.target.checked;
   document.body.classList.toggle("dyslexia-font", enabled);
@@ -85,7 +89,7 @@ document.getElementById("font-toggle").addEventListener("change", (e) => {
   showSaved();
 });
 
-// ─── HIGH CONTRAST TOGGLE ────────────────────────────────────────────────────
+// accessabilty freature: HIGH CONTRAST TOGGLE
 document.getElementById("contrast-toggle").addEventListener("change", (e) => {
   const enabled = e.target.checked;
   document.body.classList.toggle("high-contrast", enabled);
@@ -93,7 +97,15 @@ document.getElementById("contrast-toggle").addEventListener("change", (e) => {
   showSaved();
 });
 
-// ─── EXPORT DATA ─────────────────────────────────────────────────────────────
+// for the dark mode toggle 
+document.getElementById("dark-mode-toggle").addEventListener("change", (e) => {
+  const enabled = e.target.checked;
+  document.body.classList.toggle("dark-mode", enabled);
+  localStorage.setItem("darkMode", enabled);
+  showSaved();
+});
+
+// if the user wishes to download their data
 document.getElementById("download-data").addEventListener("click", async () => {
   if (!currentUser) return;
 

@@ -4,6 +4,16 @@
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>HabitIQ | Your Profile</title>
     <link rel="stylesheet" href="styles.css"/>
+    <script>
+          document.addEventListener('DOMContentLoaded', function() {
+            if (localStorage.getItem('darkMode') === 'true')
+              document.body.classList.add('dark-mode');
+            if (localStorage.getItem('highContrast') === 'true')
+              document.body.classList.add('high-contrast');
+            if (localStorage.getItem('dyslexiaFont') === 'true')
+              document.body.classList.add('dyslexia-font');
+            });
+      </script>
   </head>
   <body>
 

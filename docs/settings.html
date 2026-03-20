@@ -3,21 +3,32 @@
 <head>
   <meta charset="UTF-8"  name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>HabitIQ | Settings</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="settings.css" />
+  <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        if (localStorage.getItem('darkMode') === 'true')
+          document.body.classList.add('dark-mode');
+        if (localStorage.getItem('highContrast') === 'true')
+          document.body.classList.add('high-contrast');
+        if (localStorage.getItem('dyslexiaFont') === 'true')
+          document.body.classList.add('dyslexia-font');
+        });
+  </script>
 </head>
 <body>
 
+ <header class="top-nav">
+  <a href="dashboard.html" class="logo">🔥 HabitIQ</a>
   <nav>
-    <a href="dashboard.html" class="nav-logo">🔥 HabitIQ</a>
-    <div class="nav-links">
-      <a href="dashboard.html">Dashboard</a>
-      <a href="all-habits.html">All Habits</a>
-      <a href="profile.html">Profile</a>
-      <a href="settings.html" class="active">Settings</a>
-    </div>
+    <a href="dashboard.html">Dashboard</a>
+    <a href="all-habits.html">All Habits</a>
+    <a href="profile.html">Profile</a>
+    <a href="progress.html">View Progress</a>
+    <a href="settings.html" class="active">Settings</a>
   </nav>
-  <button id="logout">Log out</button>
+  <button id="logout" class="logout-btn">Log out</button>
+</header>
   <main class="settings-main">
 
     <div class="page-header">
@@ -55,11 +66,22 @@
       <label class="toggle-row">
         <div class="toggle-info">
           <span class="toggle-label">High contrast mode</span>
-          <span class="toggle-desc">Increases visual contrast across the app for improved readability.</span>
+          <span class="toggle-desc">Increases visual contrast and improved readability.</span>
         </div>
         <input type="checkbox" id="contrast-toggle">
       </label>
+
+      <label class="toggle-row">
+      <div class="toggle-info">
+        <span class="toggle-label">Dark mode</span>
+        <span class="toggle-desc">Better on the eyes in low-light environments.</span>
+      </div>
+      <input type="checkbox" id="dark-mode-toggle">
+    </label>
+
     </section>
+    
+    
 
     <p class="save-indicator hidden" id="save-indicator">✓ Settings saved</p>
 

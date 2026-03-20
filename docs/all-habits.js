@@ -279,7 +279,8 @@ function openEditModal(habitData) {
   document.getElementById("habit-category").value = habitData.category || "📚";
   document.getElementById("habit-impact").value = habitData.impact || "medium";
   document.getElementById("habit-motivation").value = habitData.motivation || "";
-  document.getElementById("habit-time").value = habitData.time || "";
+  const timeInput = document.getElementById("habit-time");
+if (timeInput) timeInput.value = habitData.time || "";
 
   editingHabitId = habitData.id;
   modal.classList.remove("hidden");
@@ -342,7 +343,8 @@ if (openModalBtn) {
     document.getElementById("habit-category").value = "📚";
     document.getElementById("habit-impact").value = "medium";
     document.getElementById("habit-motivation").value = "";
-    document.getElementById("habit-time").value = ""; 
+    const timeInput = document.getElementById("habit-time");
+if (timeInput) timeInput.value = "";
     
     modal.classList.remove("hidden");
   });
