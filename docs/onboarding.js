@@ -48,6 +48,16 @@ steps.forEach((step, index) => {
   const nextBtn = step.querySelector(".next");
   const finishBtn = step.querySelector("#finish");
   const optionButtons = step.querySelectorAll("button[data-value]");
+  const backBtn = step.querySelector(".back");
+
+  if (backBtn) {
+    backBtn.addEventListener("click", () => {
+      if (currentStep > 0) {
+        currentStep--;
+        showStep(currentStep);
+      }
+    });
+  }
 
   optionButtons.forEach(btn => {
     btn.addEventListener("click", () => {
