@@ -5,7 +5,7 @@ export class ProgressTracker{
     }
     // this will be used to calclute the current streak held by the user
     calculateStreak() {
-    // 🔒 Prevent infinite loop if no habits
+    // Prevent infinite loop if no habits
     if (!this.habits || this.habits.length === 0) {
         return 0;
     }
@@ -18,11 +18,13 @@ export class ProgressTracker{
         let allCompleted = true;
 
         for (let habit of this.habits) {
-            const completions = habit.completions || {};
-            if (!completions[dateStr]) {
-                allCompleted = false;
-                break;
-            }
+          const isPaused = habit.pausedUntil && habit.pausedUntil >= dateStr;
+          if (isPaused) continue; // skip paused habits and continues the streak as normal if the habit is pauased
+          const completions = habit.completions || {};
+          if (!completions[dateStr]) {
+            allCompleted = false;
+            break;
+          }
         }
 
         if (allCompleted) {
@@ -58,9 +60,9 @@ export class ProgressTracker{
     const today = new Date();
     const startOfWeek = new Date(today);
     
-    // Adjust to Monday (assuming Monday is first day of week)
-    const day = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
-    const diff = day === 0 ? 6 : day - 1; // If Sunday, go back 6 days to Monday
+    
+    const day = today.getDay(); 
+    const diff = day === 0 ? 6 : day - 1; 
     startOfWeek.setDate(today.getDate() - diff);
     
     for (let i = 0; i < 7; i++) {
@@ -96,48 +98,7 @@ export class ProgressTracker{
     
     return weekDays;
   }
-  // detectStreakRisk()
-  // {
-  //   const streak = this.calculateStreak();
-  //   const daily = this.calculateDailyProgress();
-  //   //debugging
-  //   console.log("Streak:", streak);
-  //   console.log("Daily:", daily);
-  //   if (streak >= 3 && daily.completed < daily.total) {
-  //   return {
-  //     type: "warning",
-  //     title: "Streak at Risk",
-  //     message: "You're close to breaking your streak. Complete today's habits to keep it alive."
-      
-  //   };
-  // }
-  // return null;
-  // }
-
-//   detectStreakRisk() {
-//   const daily = this.calculateDailyProgress();
-
-//   // calculate streak ignoring today
-//   const originalToday = this.today;
-//   const yesterday = new Date();
-//   yesterday.setDate(yesterday.getDate() - 1);
-//   this.today = yesterday.toISOString().split('T')[0];
-
-//   const streakUntilYesterday = this.calculateStreak();
-
-//   this.today = originalToday;
-
-//   if (streakUntilYesterday >= 3 && daily.completed < daily.total) {
-//     return {
-//       type: "warning",
-//       title: "Streak at Risk",
-//       message: "You're close to breaking your streak."
-//     };
-//   }
-
-//   return null;
-// }
-// testing 
+   
 detectStreakRisk() {
   const daily = this.calculateDailyProgress();
 

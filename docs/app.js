@@ -319,7 +319,7 @@ function renderHabit(id, habitData, uid) {
   metaRow.appendChild(timeBadge);
 }
 
-  // // Paused badge
+  //Paused badge
   if (isPaused) {
     const pausedBadge = document.createElement("span");
     pausedBadge.classList.add("paused-badge");
@@ -329,7 +329,6 @@ function renderHabit(id, habitData, uid) {
 
   leftSection.appendChild(metaRow);
 
-  // Right section
   const rightSection = document.createElement("div");
   rightSection.classList.add("habit-right");
 

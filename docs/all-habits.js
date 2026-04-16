@@ -74,7 +74,7 @@ onAuthStateChanged(auth, async (user) => {
   loadAllHabits(user.uid);
 });
 
-// Load ALL habits (no date filtering)
+// Load ALL habits 
 async function loadAllHabits(uid) {
   habitsContainer.innerHTML = "";
   
@@ -111,7 +111,7 @@ function renderHabit(habitData, uid) {
   habitCard.dataset.category = habitData.category || "📌";
   habitCard.dataset.name = habitData.name.toLowerCase();
 
-  // Left section with icon and details
+  
   const leftSection = document.createElement("div");
   leftSection.classList.add("habit-left");
 
@@ -129,7 +129,7 @@ function renderHabit(habitData, uid) {
   titleRow.appendChild(title);
   leftSection.appendChild(titleRow);
 
-  // Meta row (category, difficulty, frequency)
+  // (category, difficulty, frequency)
   const metaRow = document.createElement("div");
   metaRow.classList.add("habit-meta");
 
@@ -182,7 +182,7 @@ function renderHabit(habitData, uid) {
 
   leftSection.appendChild(metaRow);
 
-  // Right section with completion stats and buttons
+  
   const rightSection = document.createElement("div");
   rightSection.classList.add("habit-right");
 
