@@ -39,15 +39,16 @@ export class ProgressTracker{
 }
     // calcutaing current days progress
     calculateDailyProgress(){
-        const total = this.habits.length;
-        let completed = 0;
+    const activeHabits = this.habits.filter(h => !h.pausedUntil || h.pausedUntil < this.today);
+    const total = activeHabits.length;
+    let completed = 0;
 
-        this.habits.forEach(habit =>{
-            const completions =habit.completions || {};
-            if(completions[this.today]){
-                completed++;
-            }
-        });
+    activeHabits.forEach(habit =>{
+        const completions = habit.completions || {};
+        if(completions[this.today]){
+            completed++;
+        }
+    });
         return{
             completed,
             total,
@@ -72,14 +73,18 @@ export class ProgressTracker{
       
       // Calculate completion for this day
       let completedCount = 0;
-      this.habits.forEach(habit => {
-        const completions = habit.completions || {};
-        if (completions[dateStr]) {
-          completedCount++;
-        }
-      });
       
-      const total = this.habits.length;
+     const activeHabits = this.habits.filter(h => !h.pausedUntil || h.pausedUntil < dateStr);
+
+    activeHabits.forEach(habit => {
+      const completions = habit.completions || {};
+      if (completions[dateStr]) {
+        completedCount++;
+      }
+    });
+
+const total = activeHabits.length;
+
       const percentage = total > 0 ? (completedCount / total) * 100 : 0;
       
       // Determine status based on completion percentage
@@ -98,7 +103,7 @@ export class ProgressTracker{
     
     return weekDays;
   }
-   
+
 detectStreakRisk() {
   const daily = this.calculateDailyProgress();
 
@@ -114,6 +119,8 @@ detectStreakRisk() {
     let allCompleted = true;
 
     for (let habit of habitsCopy) {
+      const isPaused = habit.pausedUntil && habit.pausedUntil >= dateStr;
+      if (isPaused) continue;
       const completions = habit.completions || {};
       if (!completions[dateStr]) {
         allCompleted = false;

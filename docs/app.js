@@ -151,6 +151,12 @@ const result = await getAIInsight(riskProfile, reinforcementProfile, achievement
 
 aiInsightContainer.textContent = result.insight;
 
+const timestamp = document.createElement("p");
+timestamp.id = "insight-timestamp";
+const now = new Date();
+timestamp.textContent = `Last updated: ${now.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}`;
+aiInsightContainer.parentElement.appendChild(timestamp);
+
 initInsightFeedback();
 
 const insightModal = document.getElementById("insight-modal");
