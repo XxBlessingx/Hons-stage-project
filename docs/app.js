@@ -46,7 +46,16 @@ const advancedArrow = document.getElementById("advanced-arrow");
 
 let editingHabitId = null;
 // testing purposes - forcing circumstanes
- let currentAiConsent = false; // defalut but will be overwritten by Firestore value
+let currentAiConsent = false; // defalut but will be overwritten by Firestore value
+let lastCompletedHabit = null;
+let undoTimeout = null;
+
+function ensureToastOnBody() {
+  let toast = document.getElementById("undo-toast");
+    if (toast && toast.parentElement !== document.body) {
+        document.body.appendChild(toast);
+    }
+  }
 
 if (toggleAdvancedBtn) {
   toggleAdvancedBtn.addEventListener("click", () => {
@@ -256,6 +265,7 @@ async function saveFeedback(type, insightText) {
 function renderHabit(id, habitData, uid) {
   const today = new Date().toISOString().split("T")[0];
   const isPaused = habitData.pausedUntil && habitData.pausedUntil >= today;
+  
 
   const habitCard = document.createElement("div");
   habitCard.classList.add("habit-card");
@@ -346,7 +356,7 @@ function renderHabit(id, habitData, uid) {
     completeCircle.classList.add("completed");
   }
 
-  // Completion click handler
+  // Completion click handler with undo functionality
   completeCircle.addEventListener("click", async (e) => {
     if (isPaused) return;
     e.stopPropagation();
@@ -358,11 +368,39 @@ function renderHabit(id, habitData, uid) {
     if (habit.completions && habit.completions[today]) return;
 
     try {
-      await updateDoc(habitRef, {completions: { ...(habit.completions || {}), [today]: true }});
-      await loadHabits(uid, currentAiConsent);
+        // Store completion data for potential undo
+        lastCompletedHabit = {
+            id: id,
+            uid: uid,
+            date: today
+        };
+        
+        // Update Firestore
+        await updateDoc(habitRef, {
+            completions: { ...(habit.completions || {}), [today]: true }
+        });
+        
+        // Show undo toast
+        ensureToastOnBody();
+        const toast = document.getElementById("undo-toast");
+        const messageEl = document.getElementById("undo-message");
+        messageEl.textContent = ` "${habitData.name}" completed!`;
+        toast.classList.remove("hidden");
+        
+        // Clear previous timeout if exists
+        //if (undoTimeout) clearTimeout(undoTimeout);
+        
+        // // Auto-hide after 5 seconds
+        // undoTimeout = setTimeout(() => {
+        //     toast.classList.add("hidden");
+        //     lastCompletedHabit = null;
+        // }, 5000);
+
+        
+        await loadHabits(uid, currentAiConsent);
     } catch (err) {
-      console.error("Failed to complete habit:", err);
-      alert("Could not save completion. Please try again.");
+        console.error("Failed to complete habit:", err);
+        alert("Could not save completion. Please try again.");
     }
   });
 
@@ -499,6 +537,63 @@ function renderHabit(id, habitData, uid) {
   habitCard.appendChild(rightSection);
   habitList.appendChild(habitCard);
 }
+
+async function undoLastCompletion() {
+    if (!lastCompletedHabit) return;
+
+    ensureToastOnBody();
+    const toast = document.getElementById("undo-toast");
+    
+    try {
+        const { id, uid, date } = lastCompletedHabit;
+        const habitRef = doc(db, "users", uid, "habits", id);
+        const habitSnap = await getDoc(habitRef);
+        const habit = habitSnap.data();
+        
+        if (habit.completions && habit.completions[date]) {
+            // Remove the completion
+            const newCompletions = { ...habit.completions };
+            delete newCompletions[date];
+            
+            await updateDoc(habitRef, {
+                completions: newCompletions
+            });
+            
+            // Hide toast
+            toast.classList.add("hidden");
+            
+            // Show quick confirmation
+            const undoConfirm = document.createElement("div");
+            undoConfirm.textContent = "↩️ Undone!";
+            undoConfirm.style.position = "fixed";
+            undoConfirm.style.bottom = "100px";
+            undoConfirm.style.left = "50%";
+            undoConfirm.style.transform = "translateX(-50%)";
+            undoConfirm.style.background = "#4caf50";
+            undoConfirm.style.color = "white";
+            undoConfirm.style.padding = "8px 16px";
+            undoConfirm.style.borderRadius = "8px";
+            undoConfirm.style.zIndex = "1000";
+            document.body.appendChild(undoConfirm);
+            
+            setTimeout(() => {
+                undoConfirm.remove();
+            }, 2000);
+            
+            await loadHabits(uid, currentAiConsent);
+        }
+        
+        lastCompletedHabit = null;
+        if (undoTimeout) clearTimeout(undoTimeout);
+        
+    } catch (err) {
+        console.error("Failed to undo completion:", err);
+        alert("Could not undo. Please try again.");
+    }
+}
+
+// Add event listener for undo button - ADD THIS RIGHT AFTER undoLastCompletion function
+document.getElementById("undo-btn")?.addEventListener("click", undoLastCompletion);
 
 // SAVE HABIT (create or update)
 const saveHabitBtn = document.getElementById("save-habit");
@@ -663,7 +758,12 @@ function startTutorial() {
     },
     {
       target: "#habit-list",
-      text: "✅ This is where your habits will show up. When you've completed your any habit click the circle to mark it as complete.",
+      text: "This is where your habits will show up. When you've completed your any habit click the circle to mark it as complete.",
+    },
+     {
+      target: "#undo-toast",
+      text: "Clicked complete on a habit by mistake click the 'Undo' to bring it back",
+      showToast: true
     },
   ];
 
@@ -706,6 +806,34 @@ function startTutorial() {
 
     // Enable/disable previous button
     prevBtn.disabled = index === 0;
+
+       if (step.showToast) {
+        console.log("showing toast demo");
+      const toast = document.getElementById("undo-toast");
+      const messageEl = document.getElementById("undo-message");
+      if (toast && messageEl) {
+        // Make sure toast is on body
+        if (toast.parentElement !== document.body) {
+          document.body.appendChild(toast);
+        }
+        // Set demo message
+        messageEl.textContent = " Example: 'Undo' appears here!";
+        // Show toast
+        toast.classList.remove("hidden");
+        // Auto-hide after 4 seconds
+        setTimeout(() => {
+          if (toast && !toast.classList.contains("hidden")) {
+            toast.classList.add("hidden");
+          }
+        }, 4000);
+      }
+    }else {
+      
+      const toast = document.getElementById("undo-toast");
+      if (toast) {
+        toast.classList.add("hidden");
+      }
+    }
 
     // Make tooltip visible temporarily to get accurate dimensions
     tooltip.style.visibility = 'hidden';
