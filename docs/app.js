@@ -794,8 +794,15 @@ function startTutorial() {
     }
 
     // Highlight target
-    highlightedEl = target;
-    target.classList.add("tutorial-highlight");
+     highlightedEl = target;
+        target.classList.add("tutorial-highlight");
+
+    // Lift undo-toast above overlay when it's the active step
+    if (target.id === "undo-toast") {
+      target.style.zIndex = "1002";
+    } else {
+      document.getElementById("undo-toast").style.zIndex = "999";
+    }
 
     // Update tooltip text
     tooltipText.textContent = step.text;

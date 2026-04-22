@@ -1908,7 +1908,7 @@ body.dark-mode .tutorial-prev:hover:not(:disabled) {
     display: flex;
     gap: 12px;
     align-items: center;
-    z-index: 10000;
+    z-index: 999;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     font-size: 0.85rem;
     border: 1px solid rgba(124, 58, 237, 0.4);
@@ -1937,3 +1937,21 @@ body.dark-mode .tutorial-prev:hover:not(:disabled) {
     filter: brightness(0.8);
 }
 
+.tutorial-overlay.active .undo-toast.tutorial-highlight {
+    z-index: 1002 !important;
+    opacity: 1 !important;
+    filter: none !important;
+}
+.floating-btn.tutorial-highlight {
+  position: fixed !important;
+  outline: 3px solid #7c3aed;
+  outline-offset: 4px;
+  box-shadow: 0 0 0 4px rgba(124,58,237,0.3), 0 0 20px rgba(124,58,237,0.4);
+  background: white;
+  z-index: 1001;
+}
+.floating-btn.tutorial-highlight {
+  background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
+  color: white !important;
+  border-radius: 50% !important;
+}
