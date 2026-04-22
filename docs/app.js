@@ -647,23 +647,23 @@ function startTutorial() {
   const steps = [
     {
       target: ".streak-header",
-      text: "🔥 This is your streak counter. Complete all your habits every day to keep it growing!",
+      text: "This is your streak counter. Complete all your habits every day to keep it growing!",
     },
     {
       target: ".weekly-calendar",
-      text: "📅 Your weekly calendar shows how consistent you've been. Green means a full day, yellow means partial.",
+      text: "Here's your weekly calendar shows how consistent you've been. Green = a full day, yellow = partial.",
     },
     {
       target: "#open-insight-modal",
-      text: "🤖 Tap here to open your AI Insight Engine — it analyses your habits and gives you personalised feedback every day.",
+      text: "Here's  your AI Insight Engine. It basically gives you a weekly summary about you, it analysisng you habits and behavioral patterns and tells you what you've been doing well and areas that you might need to work on.",
     },
     {
       target: "#open-modal",
-      text: "➕ Tap this button to add your first habit. Try adding something simple to start!",
+      text: "➕ Want to add your first habit. Tap here!",
     },
     {
       target: "#habit-list",
-      text: "✅ Your habits appear here. Tap the circle on any habit to mark it as done for today.",
+      text: "✅ This is where your habits will show up. When you've completed your any habit click the circle to mark it as complete.",
     },
   ];
 
@@ -671,11 +671,13 @@ function startTutorial() {
   const overlay = document.getElementById("tutorial-overlay");
   const tooltip = document.getElementById("tutorial-tooltip");
   const tooltipText = document.getElementById("tutorial-text");
-  const nextBtn = document.getElementById("tutorial-next");
-  const skipBtn = document.getElementById("tutorial-skip");
+  let nextBtn = document.getElementById("tutorial-next");
+  let prevBtn = document.getElementById("tutorial-prev");
+  let skipBtn = document.getElementById("tutorial-skip");
   const stepIndicator = document.getElementById("tutorial-step-indicator");
 
   let highlightedEl = null;
+
 
   function showStep(index) {
     // Remove previous highlight
@@ -702,28 +704,100 @@ function startTutorial() {
     // Update button text on last step
     nextBtn.textContent = index === steps.length - 1 ? "Done ✓" : "Next →";
 
-    // Position tooltip near the target
+    // Enable/disable previous button
+    prevBtn.disabled = index === 0;
+
+    // Make tooltip visible temporarily to get accurate dimensions
+    tooltip.style.visibility = 'hidden';
+    tooltip.style.display = 'block';
+    
+    // Get tooltip dimensions
+    const tooltipWidth = tooltip.offsetWidth;
+    const tooltipHeight = tooltip.offsetHeight;
+    
+    // Hide it again for positioning
+    tooltip.style.visibility = '';
+    tooltip.style.display = '';
+
+    // Get target position relative to viewport
     const rect = target.getBoundingClientRect();
-    const tooltipWidth = 280;
-    const tooltipHeight = 140;
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
     const margin = 16;
 
+    // Calculate position - try below first
     let top = rect.bottom + margin;
-    let left = rect.left;
-
-    // Keep tooltip within viewport
-    if (left + tooltipWidth > window.innerWidth) {
-      left = window.innerWidth - tooltipWidth - margin;
-    }
-    if (top + tooltipHeight > window.innerHeight) {
+    let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
+    
+    // Horizontal boundary checks
+    left = Math.max(margin, Math.min(left, viewportWidth - tooltipWidth - margin));
+    
+    // Vertical boundary checks - if below viewport, place above
+    if (top + tooltipHeight > viewportHeight - margin) {
       top = rect.top - tooltipHeight - margin;
     }
+    
+    // If still not visible (target is at top), place below with scroll hint
+    if (top < margin) {
+      top = rect.bottom + margin;
+      // Add a small indicator that user should scroll
+      tooltip.classList.add('scroll-hint');
+    } else {
+      tooltip.classList.remove('scroll-hint');
+    }
+    
+    // Ensure tooltip doesn't go off the top
+    if (top < margin) {
+      top = margin;
+    }
 
+    // Apply position
     tooltip.style.top = `${top}px`;
     tooltip.style.left = `${left}px`;
 
+    // Show overlay and tooltip
     overlay.classList.remove("hidden");
     overlay.classList.add("active");
+    
+    // Smoothly scroll target into view if needed
+    const targetRect = target.getBoundingClientRect();
+    if (targetRect.top < 0 || targetRect.bottom > viewportHeight) {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // Small delay to reposition after scroll
+      setTimeout(() => {
+        // Recalculate position after scroll
+        const newRect = target.getBoundingClientRect();
+        let newTop = newRect.bottom + margin;
+        let newLeft = newRect.left + (newRect.width / 2) - (tooltipWidth / 2);
+        newLeft = Math.max(margin, Math.min(newLeft, viewportWidth - tooltipWidth - margin));
+        
+        if (newTop + tooltipHeight > viewportHeight - margin) {
+          newTop = newRect.top - tooltipHeight - margin;
+        }
+        if (newTop < margin) {
+          newTop = margin;
+        }
+        
+        tooltip.style.top = `${newTop}px`;
+        tooltip.style.left = `${newLeft}px`;
+      }, 300);
+    }
+  }
+
+  function nextStep() {
+    if (currentStep + 1 < steps.length) {
+      currentStep++;
+      showStep(currentStep);
+    } else {
+      endTutorial();
+    }
+  }
+
+  function prevStep() {
+    if (currentStep - 1 >= 0) {
+      currentStep--;
+      showStep(currentStep);
+    }
   }
 
   function endTutorial() {
@@ -741,19 +815,29 @@ function startTutorial() {
     }
   }
 
-  nextBtn.addEventListener("click", () => {
-    currentStep++;
-    if (currentStep >= steps.length) {
-      endTutorial();
-    } else {
-      showStep(currentStep);
-    }
-  });
+  // Remove existing event listeners by replacing buttons with clones
+  const newNextBtn = nextBtn.cloneNode(true);
+  const newPrevBtn = prevBtn.cloneNode(true);
+  const newSkipBtn = skipBtn.cloneNode(true);
+  
+  nextBtn.parentNode.replaceChild(newNextBtn, nextBtn);
+  prevBtn.parentNode.replaceChild(newPrevBtn, prevBtn);
+  skipBtn.parentNode.replaceChild(newSkipBtn, skipBtn);
+  
+  // Update references
+  nextBtn = newNextBtn;
+  prevBtn = newPrevBtn;
+  skipBtn = newSkipBtn;
 
+  // Add event listeners
+  nextBtn.addEventListener("click", nextStep);
+  prevBtn.addEventListener("click", prevStep);
   skipBtn.addEventListener("click", endTutorial);
 
+  // Start tutorial
   showStep(0);
 }
+
 // LOGOUT
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
