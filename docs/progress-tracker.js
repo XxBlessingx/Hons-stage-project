@@ -40,26 +40,27 @@ export class ProgressTracker{
     // calcutaing current days progress
     calculateDailyProgress(){
     const activeHabits = this.habits.filter(h => !h.pausedUntil || h.pausedUntil < this.today);
-    const total = activeHabits.length;
+    const total = activeHabits.length;// how many active habits 
     let completed = 0;
 
     activeHabits.forEach(habit =>{
         const completions = habit.completions || {};
         if(completions[this.today]){
-            completed++;
+            completed++;// how many completeled habits 
         }
     });
+    
         return{
             completed,
             total,
             percentage: total > 0 ? (completed/total)*100:0
         };
-    }
+    }// send back compeleted habits
     // Generate weekly calendar data
   getWeekDays() {
     const weekDays = [];
     const today = new Date();
-    const startOfWeek = new Date(today);
+    const startOfWeek = new Date(today);// starting from monday 
     
     
     const day = today.getDay(); 
@@ -74,18 +75,18 @@ export class ProgressTracker{
       // Calculate completion for this day
       let completedCount = 0;
       
-     const activeHabits = this.habits.filter(h => !h.pausedUntil || h.pausedUntil < dateStr);
+     const activeHabits = this.habits.filter(h => !h.pausedUntil || h.pausedUntil < dateStr);// doesnt include puase habits in streak
 
     activeHabits.forEach(habit => {
       const completions = habit.completions || {};
       if (completions[dateStr]) {
-        completedCount++;
+        completedCount++;// counts the number of active habits 
       }
     });
 
 const total = activeHabits.length;
 
-      const percentage = total > 0 ? (completedCount / total) * 100 : 0;
+      const percentage = total > 0 ? (completedCount / total) * 100 : 0;// calculate percentage of days 
       
       // Determine status based on completion percentage
       let status = 'empty';
@@ -106,8 +107,8 @@ const total = activeHabits.length;
 
 detectStreakRisk() {
   const daily = this.calculateDailyProgress();
-
-  // Clone habits so we don't mutate original
+// dectes when user is at risk 
+  
   const habitsCopy = JSON.parse(JSON.stringify(this.habits));
 
   let streak = 0;
@@ -143,7 +144,7 @@ detectStreakRisk() {
       message: "You're close to breaking your streak. Complete today to protect it."
     };
   }
-
+// warning user that they are at risk
   return null;
 }
 
@@ -172,10 +173,11 @@ detectStreakRisk() {
     if (streak === 100) return "💯 100 DAYS! You're a legend!";
     return `🔥 ${streak} day streak! You're on fire!`;
   }
+  // gamification provides motivational messages 
 
   // Check for milestone unlocks
   checkMilestones(streak) {
-    const milestones = [7, 14, 21, 30, 50, 100];
+    const milestones = [7, 14, 21, 30, 50, 100]; // different milestones that could be reached by user
     const unlocked = [];
     
     milestones.forEach(milestone => {
@@ -185,11 +187,11 @@ detectStreakRisk() {
     });
     
     return unlocked;
-  }
+  }// if collected is stores and shown on the user progess page
 
   calculateLongestStreak() {
   if (!this.habits || this.habits.length === 0) return 0;
-
+// checking for the longest streak held
   let longest = 0;
   let current = 0;
 
@@ -204,13 +206,13 @@ detectStreakRisk() {
   });
 
   const sortedDates = Array.from(completionDates).sort();
-
+// sorting the dates of completed habits 
   for (let i = 0; i < sortedDates.length; i++) {
     if (i === 0) {
       current = 1;
     } else {
-      const prev = new Date(sortedDates[i - 1]);
-      const curr = new Date(sortedDates[i]);
+      const prev = new Date(sortedDates[i - 1]); // based on last week 
+      const curr = new Date(sortedDates[i]);// based on this week 
 
       const diff = (curr - prev) / (1000 * 60 * 60 * 24);
 

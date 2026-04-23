@@ -27,22 +27,22 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-// Grab all onboarding steps
+// Gather the onboarding steps
 const steps = document.querySelectorAll(".step");
 
 // Track which step we’re on
 let currentStep = 0;
 
-// Store answers
+// Stores the  answers
 const onboardingData = {};
 
-// Show ONLY one step
+// Show ONLY one step at a time
 function showStep(index) {
   steps.forEach(step => step.classList.remove("active"));
   steps[index].classList.add("active");
 }
 
-// Run logic for each step
+// Repeats for each step 
 steps.forEach((step, index) => {
   const key = step.dataset.key;
   const nextBtn = step.querySelector(".next");
@@ -61,7 +61,7 @@ steps.forEach((step, index) => {
 
   optionButtons.forEach(btn => {
     btn.addEventListener("click", () => {
-      // Convert "true"/"false" strings to real booleans for ai_consent
+      
       if (btn.dataset.value === "true") {
           onboardingData[key] = true;
       } else if (btn.dataset.value === "false") {
@@ -101,7 +101,7 @@ pickerCards.forEach(card => {
 });
 
 skipBtn.addEventListener("click", () => {
-  // Deselect all and finish with no habits
+  // if not habit is chosen then skips 
   pickerCards.forEach(card => card.classList.remove("selected"));
   selectedCountEl.textContent = "0";
   finishBtn.disabled = false;
@@ -143,7 +143,7 @@ finishBtn.addEventListener("click", async () => {
 
     await Promise.all(habitPromises);
 
-    // After saving onboarding => go to dashboard
+    // After saving onboarding redirects to the dashboard
     window.location.href = "dashboard.html";
 
   } catch (error) {

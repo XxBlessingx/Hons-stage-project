@@ -133,7 +133,7 @@ function renderHabit(habitData, uid) {
   const metaRow = document.createElement("div");
   metaRow.classList.add("habit-meta");
 
-  // Category badge
+  // Category section
   if (habitData.category) {
     const categoryBadge = document.createElement("span");
     categoryBadge.classList.add("category-badge");
@@ -150,7 +150,7 @@ function renderHabit(habitData, uid) {
     metaRow.appendChild(categoryBadge);
   }
 
-  // Difficulty badge
+  // Difficulty section and icons 
   if (habitData.difficulty) {
     const difficultyBadge = document.createElement("span");
     difficultyBadge.classList.add("difficulty-badge");
@@ -164,7 +164,7 @@ function renderHabit(habitData, uid) {
     metaRow.appendChild(difficultyBadge);
   }
 
-  // Frequency badge
+  // Frequency section
   if (habitData.frequency) {
     const frequencyBadge = document.createElement("span");
     frequencyBadge.classList.add("frequency-badge");
@@ -172,7 +172,7 @@ function renderHabit(habitData, uid) {
     metaRow.appendChild(frequencyBadge);
   }
 
-  // time option
+  // time option not a must 
   if (habitData.time) {
     const timeBadge = document.createElement("span");
     timeBadge.classList.add("time-badge");
@@ -195,11 +195,11 @@ function renderHabit(habitData, uid) {
   statsSpan.textContent = `✅ ${totalCompletions} times`;
   rightSection.appendChild(statsSpan);
 
-  // Button container
+  
   const buttonContainer = document.createElement("div");
   buttonContainer.classList.add("button-container");
 
-  // Edit button
+  // Edit habit button
   const editBtn = document.createElement("button");
   editBtn.textContent = "✎";
   editBtn.classList.add("icon-btn", "edit-btn");
@@ -209,7 +209,7 @@ function renderHabit(habitData, uid) {
     openEditModal(habitData);
   });
 
-  // Delete button
+  // Delete habit button
   const delBtn = document.createElement("button");
   delBtn.textContent = "🗑";
   delBtn.classList.add("icon-btn", "delete-btn");
@@ -228,7 +228,7 @@ function renderHabit(habitData, uid) {
   habitsContainer.appendChild(habitCard);
 }
 
-// Filter habits based on search and category
+// Filter habits throught search and category
 function filterHabits() {
   const searchTerm = searchInput.value.toLowerCase();
   const category = categoryFilter.value;
@@ -250,11 +250,11 @@ function filterHabits() {
   });
 }
 
-// Event listeners for filters
+
 searchInput.addEventListener('input', filterHabits);
 categoryFilter.addEventListener('change', filterHabits);
 
-// Delete habit function
+// for deleting  habits 
 async function deleteHabit(habitId, uid, cardElement) {
   if (confirm("Are you sure you want to delete this habit?")) {
     try {
@@ -270,7 +270,7 @@ async function deleteHabit(habitId, uid, cardElement) {
   }
 }
 
-// Open edit modal
+// for editing habits 
 function openEditModal(habitData) {
   document.getElementById("modal-habit-name").value = habitData.name;
   document.getElementById("habit-frequency").value = habitData.frequency || "daily";
@@ -286,7 +286,7 @@ if (timeInput) timeInput.value = habitData.time || "";
   modal.classList.remove("hidden");
 }
 
-// Save habit (create or update)
+// Saving in charge of creating  or updating habits 
 if (saveHabitBtn) {
   saveHabitBtn.addEventListener("click", async () => {
     if (!currentUser) return;
@@ -332,7 +332,7 @@ if (saveHabitBtn) {
   });
 }
 
-// Modal controls
+
 if (openModalBtn) {
   openModalBtn.addEventListener("click", () => {
     editingHabitId = null;

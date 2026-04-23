@@ -12,7 +12,7 @@
             document.body.classList.add('high-contrast');
             if (localStorage.getItem('dyslexiaFont') === 'true')
             document.body.classList.add('dyslexia-font');
-          });
+          });// accessiblity modes and personalisation dark mode, font changes and high contrast 
         </script>
     </head>
     <body>
@@ -40,7 +40,7 @@
         placeholder="Search habits..."
         class="search-input"
       />
-      
+      <!-- adding the catagories  -->
       <select id="category-filter" class="category-filter">
         <option value="all">All Categories</option>
         <option value="📚">📚 Study</option>
@@ -70,7 +70,7 @@
     </div>
       <button id="open-modal" class="floating-btn">+</button>
   </main>
-
+<!--  for when user first enters dashboard and not habits  -->
   
   <div id="habit-modal" class="modal hidden">
     <div class="modal-content">
@@ -153,7 +153,7 @@
             <option value="high">High</option>
           </select>
         </div>
-
+// used to provide context to the habits 
         <div class="form-group">
           <label>Why does this matter?</label>
           <textarea

@@ -32,7 +32,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Elements
+
 const welcomeEl = document.getElementById("welcome");
 const logoutBtn = document.getElementById("logout");
 const habitList = document.getElementById("habit-list");
@@ -45,8 +45,8 @@ const advancedSection = document.getElementById("advanced-section");
 const advancedArrow = document.getElementById("advanced-arrow");
 
 let editingHabitId = null;
-// testing purposes - forcing circumstanes
-let currentAiConsent = false; // defalut but will be overwritten by Firestore value
+
+let currentAiConsent = false; 
 let lastCompletedHabit = null;
 let undoTimeout = null;
 
@@ -95,8 +95,7 @@ onAuthStateChanged(auth, async (user) => {
   welcomeEl.textContent = `Welcome, ${userData.name}`;
 
   currentAiConsent = userData.ai_consent;
-  //loadHabits(user.uid,  userData.ai_consent);
-  // for testing purpose - forcusing circumstances 
+  
   loadHabits(user.uid, userData.ai_consent);
 
   if (!userData.tutorialComplete) {
@@ -136,10 +135,7 @@ async function loadHabits(uid, aiConsent ) {
   document.getElementById("current-streak").textContent = streak;
   document.getElementById("streak-message").textContent = tracker.getStreakMessage(streak);
 
-  // const insight = tracker.detectStreakRisk();
-  // if (insight) {
-  //   showBehaviourMessage(insight.message);
-  // }
+  
 
   const dailyStats = tracker.calculateDailyProgress();
   document.getElementById("completed-count").textContent = dailyStats.completed;
@@ -181,7 +177,7 @@ insightModal.addEventListener("click", (e) => {
   // Weekly calendar
   renderWeeklyCalendar(allHabits);
 
-  // Render incomplete habits for today
+  
   const incomplete = allHabits.filter(habit =>
     !habit.completions || !habit.completions[today]
   );
@@ -190,7 +186,7 @@ insightModal.addEventListener("click", (e) => {
     renderHabit(habit.id, habit, uid);
   });
 
-  // Empty state
+  
   if (incomplete.length === 0 && allHabits.length > 0) {
     emptyState.classList.remove("hidden");
     emptyState.innerHTML = `
@@ -261,7 +257,7 @@ async function saveFeedback(type, insightText) {
     console.error("Failed to save feedback:", err);
   }
 }
-// RENDER INDIVIDUAL HABIT CARD
+// rending a habit at a time 
 function renderHabit(id, habitData, uid) {
   const today = new Date().toISOString().split("T")[0];
   const isPaused = habitData.pausedUntil && habitData.pausedUntil >= today;
@@ -271,7 +267,7 @@ function renderHabit(id, habitData, uid) {
   habitCard.classList.add("habit-card");
   if (isPaused) habitCard.classList.add("paused");
 
-  // Left section
+  
   const leftSection = document.createElement("div");
   leftSection.classList.add("habit-left");
 
@@ -291,7 +287,7 @@ function renderHabit(id, habitData, uid) {
   const metaRow = document.createElement("div");
   metaRow.classList.add("habit-meta");
 
-  // Category badge
+  // Category dropdown
   if (habitData.category) {
     const categoryNames = {
       "📚": "Study", "💪": "Fitness", "🥗": "Nutrition", "🧘": "Mindfulness",
@@ -305,7 +301,7 @@ function renderHabit(id, habitData, uid) {
     metaRow.appendChild(categoryBadge);
   }
 
-  // Difficulty badge
+  // Difficulty dropdown
   if (habitData.difficulty) {
     const difficultyBadge = document.createElement("span");
     difficultyBadge.classList.add("difficulty-badge");
@@ -317,7 +313,7 @@ function renderHabit(id, habitData, uid) {
     metaRow.appendChild(difficultyBadge);
   }
 
-  // Frequency badge
+  // Frequency drop down
   if (habitData.frequency) {
     const frequencyBadge = document.createElement("span");
     frequencyBadge.classList.add("frequency-badge");
@@ -335,7 +331,7 @@ function renderHabit(id, habitData, uid) {
   metaRow.appendChild(timeBadge);
 }
 
-  //Paused badge
+  //Paused button
   if (isPaused) {
     const pausedBadge = document.createElement("span");
     pausedBadge.classList.add("paused-badge");
@@ -356,7 +352,7 @@ function renderHabit(id, habitData, uid) {
     completeCircle.classList.add("completed");
   }
 
-  // Completion click handler with undo functionality
+  // completion click handler with undo functionality
   completeCircle.addEventListener("click", async (e) => {
     if (isPaused) return;
     e.stopPropagation();
@@ -368,33 +364,26 @@ function renderHabit(id, habitData, uid) {
     if (habit.completions && habit.completions[today]) return;
 
     try {
-        // Store completion data for potential undo
+        
         lastCompletedHabit = {
             id: id,
             uid: uid,
             date: today
         };
         
-        // Update Firestore
+        
         await updateDoc(habitRef, {
             completions: { ...(habit.completions || {}), [today]: true }
         });
         
-        // Show undo toast
+        
         ensureToastOnBody();
         const toast = document.getElementById("undo-toast");
         const messageEl = document.getElementById("undo-message");
         messageEl.textContent = ` "${habitData.name}" completed!`;
         toast.classList.remove("hidden");
         
-        // Clear previous timeout if exists
-        //if (undoTimeout) clearTimeout(undoTimeout);
         
-        // // Auto-hide after 5 seconds
-        // undoTimeout = setTimeout(() => {
-        //     toast.classList.add("hidden");
-        //     lastCompletedHabit = null;
-        // }, 5000);
 
         
         await loadHabits(uid, currentAiConsent);
@@ -407,7 +396,7 @@ function renderHabit(id, habitData, uid) {
   const buttonContainer = document.createElement("div");
   buttonContainer.classList.add("button-container");
 
-  // Edit button
+  
   const editBtn = document.createElement("button");
   
   editBtn.textContent = "✎";
@@ -429,7 +418,7 @@ function renderHabit(id, habitData, uid) {
     
   });
 
-  // Delete button
+  
   const delBtn = document.createElement("button");
   delBtn.textContent = "🗑";
   delBtn.classList.add("icon-btn", "delete-btn");
@@ -455,7 +444,7 @@ function renderHabit(id, habitData, uid) {
   pauseBtn.addEventListener("click", async (e) => {
   e.stopPropagation();
 
-  // If already paused, resume it
+  
   if (isPaused) {
     try {
       await updateDoc(doc(db, "users", uid, "habits", id), {
@@ -469,11 +458,11 @@ function renderHabit(id, habitData, uid) {
     return;
   }
 
-  // Remove any existing dropdown first
+  
   const existing = document.getElementById("pause-dropdown");
   if (existing) existing.remove();
 
-  // Build dropdown
+  
   const dropdown = document.createElement("div");
   dropdown.id = "pause-dropdown";
   dropdown.classList.add("pause-dropdown");
@@ -485,10 +474,10 @@ function renderHabit(id, habitData, uid) {
     <button class="pause-cancel">Cancel</button>
   `;
 
-  // Position it near the button
+  
   pauseBtn.parentElement.appendChild(dropdown);
 
-  // Option click handler
+  
   dropdown.querySelectorAll(".pause-option").forEach(btn => {
     btn.addEventListener("click", async (e) => {
       e.stopPropagation();
@@ -511,13 +500,13 @@ function renderHabit(id, habitData, uid) {
     });
   });
 
-  // Cancel button
+  
   dropdown.querySelector(".pause-cancel").addEventListener("click", (e) => {
     e.stopPropagation();
     dropdown.remove();
   });
 
-  // Close if user clicks outside
+  
   setTimeout(() => {
     document.addEventListener("click", function handler() {
       dropdown.remove();
@@ -551,7 +540,7 @@ async function undoLastCompletion() {
         const habit = habitSnap.data();
         
         if (habit.completions && habit.completions[date]) {
-            // Remove the completion
+            
             const newCompletions = { ...habit.completions };
             delete newCompletions[date];
             
@@ -562,9 +551,9 @@ async function undoLastCompletion() {
             // Hide toast
             toast.classList.add("hidden");
             
-            // Show quick confirmation
+            
             const undoConfirm = document.createElement("div");
-            undoConfirm.textContent = "↩️ Undone!";
+            undoConfirm.textContent = "Undone!";
             undoConfirm.style.position = "fixed";
             undoConfirm.style.bottom = "100px";
             undoConfirm.style.left = "50%";
@@ -592,10 +581,10 @@ async function undoLastCompletion() {
     }
 }
 
-// Add event listener for undo button - ADD THIS RIGHT AFTER undoLastCompletion function
+
 document.getElementById("undo-btn")?.addEventListener("click", undoLastCompletion);
 
-// SAVE HABIT (create or update)
+// creating and updating habits 
 const saveHabitBtn = document.getElementById("save-habit");
 const modalHabitInput = document.getElementById("modal-habit-name");
 
@@ -669,17 +658,17 @@ function initInsightFeedback() {
     const rejectBtn = document.getElementById('insight-reject');
     const thanksMsg = document.getElementById('feedback-thanks');
 
-    // Reset state each time it's called
+    
     thanksMsg.classList.add('hidden');
     acceptBtn.disabled = false;
     rejectBtn.disabled = false;
     acceptBtn.style.opacity = '1';
     rejectBtn.style.opacity = '1';
 
-    // Show buttons immediately since insight is already loaded
+    
     feedbackDiv.classList.remove('hidden');
 
-    // Remove old listeners by cloning buttons
+    
     const newAccept = acceptBtn.cloneNode(true);
     const newReject = rejectBtn.cloneNode(true);
     acceptBtn.parentNode.replaceChild(newAccept, acceptBtn);
@@ -737,7 +726,7 @@ saveEditBtn.addEventListener('click', () => {
 
 }
 
-// TUTORIAL
+// walkthrough
 function startTutorial() {
   const steps = [
     {
@@ -780,7 +769,7 @@ function startTutorial() {
 
 
   function showStep(index) {
-    // Remove previous highlight
+    
     if (highlightedEl) {
       highlightedEl.classList.remove("tutorial-highlight");
     }
@@ -793,25 +782,25 @@ function startTutorial() {
       return;
     }
 
-    // Highlight target
+    
      highlightedEl = target;
         target.classList.add("tutorial-highlight");
 
-    // Lift undo-toast above overlay when it's the active step
+    
     if (target.id === "undo-toast") {
       target.style.zIndex = "1002";
     } else {
       document.getElementById("undo-toast").style.zIndex = "999";
     }
 
-    // Update tooltip text
+    
     tooltipText.textContent = step.text;
     stepIndicator.textContent = `${index + 1} of ${steps.length}`;
 
-    // Update button text on last step
+    
     nextBtn.textContent = index === steps.length - 1 ? "Done ✓" : "Next →";
 
-    // Enable/disable previous button
+    
     prevBtn.disabled = index === 0;
 
        if (step.showToast) {
@@ -823,11 +812,11 @@ function startTutorial() {
         if (toast.parentElement !== document.body) {
           document.body.appendChild(toast);
         }
-        // Set demo message
+        
         messageEl.textContent = " Example: 'Undo' appears here!";
-        // Show toast
+        
         toast.classList.remove("hidden");
-        // Auto-hide after 4 seconds
+        
         setTimeout(() => {
           if (toast && !toast.classList.contains("hidden")) {
             toast.classList.add("hidden");
@@ -842,65 +831,65 @@ function startTutorial() {
       }
     }
 
-    // Make tooltip visible temporarily to get accurate dimensions
+    
     tooltip.style.visibility = 'hidden';
     tooltip.style.display = 'block';
     
-    // Get tooltip dimensions
+    
     const tooltipWidth = tooltip.offsetWidth;
     const tooltipHeight = tooltip.offsetHeight;
     
-    // Hide it again for positioning
+    
     tooltip.style.visibility = '';
     tooltip.style.display = '';
 
-    // Get target position relative to viewport
+    
     const rect = target.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
     const margin = 16;
 
-    // Calculate position - try below first
+    
     let top = rect.bottom + margin;
     let left = rect.left + (rect.width / 2) - (tooltipWidth / 2);
     
-    // Horizontal boundary checks
+    
     left = Math.max(margin, Math.min(left, viewportWidth - tooltipWidth - margin));
     
-    // Vertical boundary checks - if below viewport, place above
+    
     if (top + tooltipHeight > viewportHeight - margin) {
       top = rect.top - tooltipHeight - margin;
     }
     
-    // If still not visible (target is at top), place below with scroll hint
+    
     if (top < margin) {
       top = rect.bottom + margin;
-      // Add a small indicator that user should scroll
+      
       tooltip.classList.add('scroll-hint');
     } else {
       tooltip.classList.remove('scroll-hint');
     }
     
-    // Ensure tooltip doesn't go off the top
+    
     if (top < margin) {
       top = margin;
     }
 
-    // Apply position
+    
     tooltip.style.top = `${top}px`;
     tooltip.style.left = `${left}px`;
 
-    // Show overlay and tooltip
+    
     overlay.classList.remove("hidden");
     overlay.classList.add("active");
     
-    // Smoothly scroll target into view if needed
+    
     const targetRect = target.getBoundingClientRect();
     if (targetRect.top < 0 || targetRect.bottom > viewportHeight) {
       target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Small delay to reposition after scroll
+      
       setTimeout(() => {
-        // Recalculate position after scroll
+        
         const newRect = target.getBoundingClientRect();
         let newTop = newRect.bottom + margin;
         let newLeft = newRect.left + (newRect.width / 2) - (tooltipWidth / 2);
@@ -942,7 +931,7 @@ function startTutorial() {
       highlightedEl.classList.remove("tutorial-highlight");
     }
 
-    // Save to Firestore so it never shows again
+    // save to Firestore so it never shows again
     const user = auth.currentUser;
     if (user) {
       updateDoc(doc(db, "users", user.uid), { tutorialComplete: true })
@@ -950,7 +939,7 @@ function startTutorial() {
     }
   }
 
-  // Remove existing event listeners by replacing buttons with clones
+  
   const newNextBtn = nextBtn.cloneNode(true);
   const newPrevBtn = prevBtn.cloneNode(true);
   const newSkipBtn = skipBtn.cloneNode(true);
@@ -959,12 +948,12 @@ function startTutorial() {
   prevBtn.parentNode.replaceChild(newPrevBtn, prevBtn);
   skipBtn.parentNode.replaceChild(newSkipBtn, skipBtn);
   
-  // Update references
+  
   nextBtn = newNextBtn;
   prevBtn = newPrevBtn;
   skipBtn = newSkipBtn;
 
-  // Add event listeners
+  
   nextBtn.addEventListener("click", nextStep);
   prevBtn.addEventListener("click", prevStep);
   skipBtn.addEventListener("click", endTutorial);

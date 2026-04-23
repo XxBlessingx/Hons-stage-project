@@ -81,7 +81,7 @@ document.getElementById("ai-consent-toggle").addEventListener("change", async (e
   }
 });
 
-// accsessabilty feature: DYSLEXIA FONT TOGGLE 
+// font changing slider (dylexia) 
 document.getElementById("font-toggle").addEventListener("change", (e) => {
   const enabled = e.target.checked;
   document.body.classList.toggle("dyslexia-font", enabled);
@@ -89,7 +89,7 @@ document.getElementById("font-toggle").addEventListener("change", (e) => {
   showSaved();
 });
 
-// accessabilty freature: HIGH CONTRAST TOGGLE
+//  high contrast slider 
 document.getElementById("contrast-toggle").addEventListener("change", (e) => {
   const enabled = e.target.checked;
   document.body.classList.toggle("high-contrast", enabled);
@@ -97,7 +97,7 @@ document.getElementById("contrast-toggle").addEventListener("change", (e) => {
   showSaved();
 });
 
-// for the dark mode toggle 
+// for the dark mode slider
 document.getElementById("dark-mode-toggle").addEventListener("change", (e) => {
   const enabled = e.target.checked;
   document.body.classList.toggle("dark-mode", enabled);
@@ -137,7 +137,7 @@ document.getElementById("download-data").addEventListener("click", async () => {
   URL.revokeObjectURL(url);
 });
 
-// ─── DELETE ACCOUNT ──────────────────────────────────────────────────────────
+// deleting account
 document.getElementById("delete-account").addEventListener("click", () => {
   document.getElementById("delete-modal").classList.remove("hidden");
 });
@@ -150,14 +150,14 @@ document.getElementById("confirm-delete").addEventListener("click", async () => 
   if (!currentUser) return;
 
   try {
-    // Delete all habits first
+    // deleting all habits 
     const habitsSnap = await getDocs(collection(db, "users", currentUser.uid, "habits"));
     await Promise.all(habitsSnap.docs.map(d => deleteDoc(d.ref)));
 
-    // Delete user document
+    // deleting user information
     await deleteDoc(doc(db, "users", currentUser.uid));
 
-    // Delete Firebase Auth account
+    
     await deleteUser(currentUser);
 
     window.location.href = "index.html";
@@ -167,7 +167,7 @@ document.getElementById("confirm-delete").addEventListener("click", async () => 
   }
 });
 
-// ─── LOGOUT ──────────────────────────────────────────────────────────────────
+// logging out 
 document.getElementById("logout").addEventListener("click", async () => {
   await signOut(auth);
   window.location.href = "login.html";

@@ -1912,7 +1912,7 @@ body.dark-mode .tutorial-prev:hover:not(:disabled) {
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
     font-size: 0.85rem;
     border: 1px solid rgba(124, 58, 237, 0.4);
-    backdrop-filter: blur(8px);
+    /* backdrop-filter: blur(8px); */
 }
 
 .undo-toast button {
@@ -1954,4 +1954,11 @@ body.dark-mode .tutorial-prev:hover:not(:disabled) {
   background: linear-gradient(135deg, #7c3aed, #4f46e5) !important;
   color: white !important;
   border-radius: 50% !important;
+}
+#undo-toast {
+  position: fixed !important;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 999;
 }

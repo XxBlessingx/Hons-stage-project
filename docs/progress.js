@@ -21,17 +21,17 @@ onAuthStateChanged(auth, async (user) => {
   if (!user) {
     window.location.href = "login.html";
     return;
-  }
- const habits = [];
+  }//secuirty for unregister user trying to access
 
+ const habits = [];// stores habits 
  try {
-    const snapshot = await getDocs(collection(db, "users", user.uid, "habits"));
+    const snapshot = await getDocs(collection(db, "users", user.uid, "habits"));// collects habits from database
     snapshot.forEach(doc => habits.push({ id: doc.id, ...doc.data() }));
   } catch (err) {
     console.error("Failed to load progress data:", err);
     document.querySelector(".progress-main").innerHTML = "<p>Failed to load progress. Please refresh.</p>";
     return;
-  }
+  }// infroming the user that something is wrong 
 
   const behaviour = new BehaviourEngine(habits);
 
@@ -49,13 +49,13 @@ function renderWeeklyOverview(behaviour) {
     `${Math.round(risk.weeklyRate * 100)}%`;
 
   document.getElementById("risk-level").textContent =
-    risk.riskLevel;
+    risk.riskLevel;// risk level
 
   document.getElementById("highest-habit").textContent =
-    risk.highestHabit?.name || "—";
+    risk.highestHabit?.name || "—";// higest risk
 
   document.getElementById("lowest-habit").textContent =
-    risk.lowestHabit?.name || "—";
+    risk.lowestHabit?.name || "—";// lowest risk
 }
 //users trends 
 function renderTrend(behaviour) {
@@ -78,13 +78,15 @@ function renderTrend(behaviour) {
     trendEl.textContent = "Stable ➖";
     diffEl.textContent = "No change";
   }
+  // cheinking and printing out if the user is improving or declining 
+  // provide summary
 }
 // user milestones 
 function renderMilestones(behaviour) {
   const achievements = behaviour.generateAchievementProfile();
   const container = document.getElementById("milestone-container");
   container.innerHTML = "";
-
+//prints if milestone is completed
   if (achievements.length === 0) {
     container.innerHTML = "<p>No milestones yet. Keep building!</p>";
     return;
@@ -97,6 +99,7 @@ function renderMilestones(behaviour) {
     container.appendChild(badge);
   });
 }
+// checkes for acheveiments 
 
 // user performace 
 function renderHabitPerformance(behaviour) {
